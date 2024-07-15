@@ -3,13 +3,12 @@ package main
 import rl "github.com/gen2brain/raylib-go/raylib"
 
 func init_game() (Player, []rl.Rectangle) {
-	player_texture := rl.LoadTexture("resources/textures/player.png")
-	player := NewPlayer(&player_texture)
+	player := NewPlayer()
 
 	collision_rects := []rl.Rectangle{
 		rl.NewRectangle(100, 500, 1000, 100),
 		rl.NewRectangle(1300, 500, 500, 100),
-		rl.NewRectangle(800, 400, 100, 100),
+		rl.NewRectangle(800, 450, 100, 50),
 	}
 
 	return player, collision_rects
