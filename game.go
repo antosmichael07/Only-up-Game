@@ -1,9 +1,14 @@
 package main
 
-import rl "github.com/gen2brain/raylib-go/raylib"
+import (
+	"sync"
 
-func init_game() (Player, []rl.Rectangle, []SideLauncher, []Launcher, rl.Camera2D) {
+	rl "github.com/gen2brain/raylib-go/raylib"
+)
+
+func init_game() (Player, Player, []rl.Rectangle, []SideLauncher, []Launcher, rl.Camera2D) {
 	player := NewPlayer()
+	player_2 := NewPlayer()
 
 	collision_rects := []rl.Rectangle{
 		rl.NewRectangle(25, 125, 250, 25),
@@ -20,11 +25,16 @@ func init_game() (Player, []rl.Rectangle, []SideLauncher, []Launcher, rl.Camera2
 
 	camera := rl.NewCamera2D(rl.NewVector2(float32(rl.GetScreenWidth()/2), float32(rl.GetScreenHeight()/2)), rl.NewVector2(225, player.Position.Y-200), 0, 4)
 
-	return player, collision_rects, side_launchers, launchers, camera
+	return player, player_2, collision_rects, side_launchers, launchers, camera
 }
 
 func game_loop() {
-	player, collision_rects, jumpers, side_launchers, camera := init_game()
+	player, player_2, collision_rects, jumpers, side_launchers, camera := init_game()
+
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go connection(&player, &player_2, &wg)
+	wg.Wait()
 
 	for !rl.WindowShouldClose() {
 		window_manager()
@@ -33,7 +43,9 @@ func game_loop() {
 		rl.BeginMode2D(camera)
 		update_camera(&player, &camera)
 
+		player.Input()
 		player.Update(&collision_rects, &jumpers, &side_launchers)
+		player_2.Update(&collision_rects, &jumpers, &side_launchers)
 
 		for i := 0; i < len(collision_rects); i++ {
 			rl.DrawRectangleRec(collision_rects[i], rl.Black)

@@ -19,6 +19,7 @@ type Player struct {
 	SideLauncherResist float32
 	FrameTime          float32
 	AnimationTimer     float32
+	Keys               [3]byte
 }
 
 type SideLauncher struct {
@@ -89,7 +90,7 @@ func (player *Player) Drawing() {
 }
 
 func (player *Player) Draw(textures *[3]rl.Texture2D) {
-	if !rl.IsKeyDown(rl.KeyA) && !rl.IsKeyDown(rl.KeyD) && player.Gravity == 0 && player.SideLauncherPower == 0 {
+	if player.Keys[0] != 1 && player.Keys[1] != 1 && player.Gravity == 0 && player.SideLauncherPower == 0 {
 		rl.DrawTexture((*textures)[0], int32(player.Position.X), int32(player.Position.Y), rl.White)
 		player.AnimationTimer = 0
 		return
@@ -108,19 +109,19 @@ func (player *Player) Draw(textures *[3]rl.Texture2D) {
 }
 
 func (player *Player) Movement(collision_rects *[]rl.Rectangle) {
-	if rl.IsKeyDown(rl.KeyA) {
+	if player.Keys[0] == 1 {
 		player.Direction = -1
 		if player.SideLauncherPower == 0 {
 			player.Move(collision_rects, player.Speed*float32(player.Direction))
 		}
-	} else if rl.IsKeyDown(rl.KeyD) {
+	} else if player.Keys[1] == 1 {
 		player.Direction = 1
 		if player.SideLauncherPower == 0 {
 			player.Move(collision_rects, player.Speed*float32(player.Direction))
 		}
 	}
 
-	if rl.IsKeyDown(rl.KeyW) && player.OnGround(collision_rects) {
+	if player.Keys[2] == 1 && player.OnGround(collision_rects) {
 		player.Gravity = player.JumpPower
 	}
 }
@@ -158,7 +159,7 @@ func (player *Player) Fall(collision_rects *[]rl.Rectangle) {
 	player.Position.Y += player.Gravity * player.FrameTime
 }
 
-func (player Player) OnGround(collision_rects *[]rl.Rectangle) bool {
+func (player *Player) OnGround(collision_rects *[]rl.Rectangle) bool {
 	player_rect := rl.NewRectangle(player.Position.X, player.Position.Y+1, player.Scale.X, player.Scale.Y)
 
 	for i := 0; i < len(*collision_rects); i++ {
@@ -181,9 +182,9 @@ func (player *Player) SideLauncher(side_launchers *[]SideLauncher) {
 	}
 
 	if player.SideLauncherPower > 0 {
-		if rl.IsKeyDown(rl.KeyA) {
+		if player.Keys[0] == 1 {
 			player.SideLauncherPower -= player.SideLauncherResist * 2
-		} else if rl.IsKeyDown(rl.KeyD) {
+		} else if player.Keys[1] == 1 {
 			player.SideLauncherPower -= player.SideLauncherResist / 2
 			if player.SideLauncherPower < player.Speed {
 				player.SideLauncherPower = 0
@@ -196,12 +197,12 @@ func (player *Player) SideLauncher(side_launchers *[]SideLauncher) {
 			player.SideLauncherPower = 0
 		}
 	} else if player.SideLauncherPower < 0 {
-		if rl.IsKeyDown(rl.KeyA) {
+		if player.Keys[0] == 1 {
 			player.SideLauncherPower += player.SideLauncherResist / 2
 			if player.SideLauncherPower > -player.Speed {
 				player.SideLauncherPower = 0
 			}
-		} else if rl.IsKeyDown(rl.KeyD) {
+		} else if player.Keys[1] == 1 {
 			player.SideLauncherPower += player.SideLauncherResist * 2
 		} else {
 			player.SideLauncherPower += player.SideLauncherResist
