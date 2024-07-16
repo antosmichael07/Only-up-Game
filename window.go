@@ -12,12 +12,22 @@ func init_window() {
 	rl.SetTargetFPS(refresh_rate)
 	rl.ToggleFullscreen()
 	rl.SetExitKey(-1)
+
+	icon := rl.LoadImage("resources/textures/player_10.png")
+	rl.SetWindowIcon(*icon)
+	rl.UnloadImage(icon)
 }
 
-func fps_reducer() {
+func window_manager() {
 	if rl.IsWindowFocused() {
+		if !rl.IsWindowFullscreen() {
+			rl.ToggleFullscreen()
+		}
 		rl.SetTargetFPS(refresh_rate)
 	} else {
+		if rl.IsWindowFullscreen() {
+			rl.ToggleFullscreen()
+		}
 		rl.SetTargetFPS(30)
 	}
 }
