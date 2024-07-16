@@ -3,28 +3,32 @@ package main
 import rl "github.com/gen2brain/raylib-go/raylib"
 
 type Player struct {
-	Position       rl.Vector2
-	Scale          rl.Vector2
-	Texture0       [3]rl.Texture2D
-	Texture1       [3]rl.Texture2D
-	TextureScream0 [3]rl.Texture2D
-	TextureScream1 [3]rl.Texture2D
-	Speed          float32
-	Acceleration   float32
-	Gravity        float32
-	GravityPower   float32
-	JumpPower      float32
-	Direction      int8
-	JumperPower    float32
-	JumperResist   float32
-	FrameTime      float32
-	AnimationTimer float32
+	Position           rl.Vector2
+	Scale              rl.Vector2
+	Texture0           [3]rl.Texture2D
+	Texture1           [3]rl.Texture2D
+	TextureScream0     [3]rl.Texture2D
+	TextureScream1     [3]rl.Texture2D
+	Speed              float32
+	Acceleration       float32
+	Gravity            float32
+	GravityPower       float32
+	JumpPower          float32
+	Direction          int8
+	SideLauncherPower  float32
+	SideLauncherResist float32
+	FrameTime          float32
+	AnimationTimer     float32
 }
 
-type Jumper struct {
-	Rect      rl.Rectangle
-	Direction int8
-	Power     float32
+type SideLauncher struct {
+	Rect  rl.Rectangle
+	Power float32
+}
+
+type Launcher struct {
+	Rect  rl.Rectangle
+	Power float32
 }
 
 func NewPlayer() Player {
@@ -48,20 +52,21 @@ func NewPlayer() Player {
 	player.GravityPower = .125
 	player.JumpPower = -1.8
 	player.Direction = 1
-	player.JumperPower = 0
-	player.JumperResist = .05
+	player.SideLauncherPower = 0
+	player.SideLauncherResist = .05
 	player.FrameTime = 0
 	player.AnimationTimer = 0
 
 	return player
 }
 
-func (player *Player) Update(collision_rects *[]rl.Rectangle, jumpers *[]Jumper) {
+func (player *Player) Update(collision_rects *[]rl.Rectangle, side_launchers *[]SideLauncher, launchers *[]Launcher) {
 	player.FrameTime = rl.GetFrameTime() * 60
 
 	player.Movement(collision_rects)
 	player.Fall(collision_rects)
-	player.Jumper(jumpers)
+	player.SideLauncher(side_launchers)
+	player.Launcher(launchers)
 	player.Drawing()
 }
 
@@ -84,33 +89,33 @@ func (player *Player) Drawing() {
 }
 
 func (player *Player) Draw(textures *[3]rl.Texture2D) {
-	if !rl.IsKeyDown(rl.KeyA) && !rl.IsKeyDown(rl.KeyD) && player.Gravity == 0 && player.JumperPower == 0 {
+	if !rl.IsKeyDown(rl.KeyA) && !rl.IsKeyDown(rl.KeyD) && player.Gravity == 0 && player.SideLauncherPower == 0 {
 		rl.DrawTexture((*textures)[0], int32(player.Position.X), int32(player.Position.Y), rl.White)
 		player.AnimationTimer = 0
 		return
 	}
 
 	if player.AnimationTimer < 5 {
-		rl.DrawTexture((*textures)[0], int32(player.Position.X), int32(player.Position.Y), rl.White)
-	} else if player.AnimationTimer < 10 {
 		rl.DrawTexture((*textures)[1], int32(player.Position.X), int32(player.Position.Y), rl.White)
-	} else if player.AnimationTimer < 15 {
+	} else if player.AnimationTimer < 10 {
 		rl.DrawTexture((*textures)[2], int32(player.Position.X), int32(player.Position.Y), rl.White)
-	} else {
+	} else if player.AnimationTimer < 15 {
 		rl.DrawTexture((*textures)[0], int32(player.Position.X), int32(player.Position.Y), rl.White)
-		player.AnimationTimer = 0
+	} else {
+		rl.DrawTexture((*textures)[1], int32(player.Position.X), int32(player.Position.Y), rl.White)
+		player.AnimationTimer -= 15
 	}
 }
 
 func (player *Player) Movement(collision_rects *[]rl.Rectangle) {
 	if rl.IsKeyDown(rl.KeyA) {
 		player.Direction = -1
-		if player.JumperPower == 0 {
+		if player.SideLauncherPower == 0 {
 			player.Move(collision_rects, player.Speed*float32(player.Direction))
 		}
 	} else if rl.IsKeyDown(rl.KeyD) {
 		player.Direction = 1
-		if player.JumperPower == 0 {
+		if player.SideLauncherPower == 0 {
 			player.Move(collision_rects, player.Speed*float32(player.Direction))
 		}
 	}
@@ -165,47 +170,58 @@ func (player Player) OnGround(collision_rects *[]rl.Rectangle) bool {
 	return false
 }
 
-func (player *Player) Jumper(jumpers *[]Jumper) {
+func (player *Player) SideLauncher(side_launchers *[]SideLauncher) {
 	player_rect := rl.NewRectangle(player.Position.X, player.Position.Y, player.Scale.X, player.Scale.Y)
 
-	for i := 0; i < len(*jumpers); i++ {
-		if rl.CheckCollisionRecs(player_rect, (*jumpers)[i].Rect) {
-			player.JumperPower = (*jumpers)[i].Power * float32((*jumpers)[i].Direction)
+	for i := 0; i < len(*side_launchers); i++ {
+		if rl.CheckCollisionRecs(player_rect, (*side_launchers)[i].Rect) {
+			player.SideLauncherPower = (*side_launchers)[i].Power
 			break
 		}
 	}
 
-	if player.JumperPower > 0 {
+	if player.SideLauncherPower > 0 {
 		if rl.IsKeyDown(rl.KeyA) {
-			player.JumperPower -= player.JumperResist * 2
+			player.SideLauncherPower -= player.SideLauncherResist * 2
 		} else if rl.IsKeyDown(rl.KeyD) {
-			player.JumperPower -= player.JumperResist / 2
-			if player.JumperPower < player.Speed {
-				player.JumperPower = 0
+			player.SideLauncherPower -= player.SideLauncherResist / 2
+			if player.SideLauncherPower < player.Speed {
+				player.SideLauncherPower = 0
 			}
 		} else {
-			player.JumperPower -= player.JumperResist
+			player.SideLauncherPower -= player.SideLauncherResist
 		}
 
-		if player.JumperPower < 0 {
-			player.JumperPower = 0
+		if player.SideLauncherPower < 0 {
+			player.SideLauncherPower = 0
 		}
-	} else if player.JumperPower < 0 {
+	} else if player.SideLauncherPower < 0 {
 		if rl.IsKeyDown(rl.KeyA) {
-			player.JumperPower += player.JumperResist / 2
-			if player.JumperPower > -player.Speed {
-				player.JumperPower = 0
+			player.SideLauncherPower += player.SideLauncherResist / 2
+			if player.SideLauncherPower > -player.Speed {
+				player.SideLauncherPower = 0
 			}
 		} else if rl.IsKeyDown(rl.KeyD) {
-			player.JumperPower += player.JumperResist * 2
+			player.SideLauncherPower += player.SideLauncherResist * 2
 		} else {
-			player.JumperPower += player.JumperResist
+			player.SideLauncherPower += player.SideLauncherResist
 		}
 
-		if player.JumperPower > 0 {
-			player.JumperPower = 0
+		if player.SideLauncherPower > 0 {
+			player.SideLauncherPower = 0
 		}
 	}
 
-	player.Position.X += player.JumperPower * player.FrameTime
+	player.Position.X += player.SideLauncherPower * player.FrameTime
+}
+
+func (player *Player) Launcher(launchers *[]Launcher) {
+	player_rect := rl.NewRectangle(player.Position.X, player.Position.Y, player.Scale.X, player.Scale.Y)
+
+	for i := 0; i < len(*launchers); i++ {
+		if rl.CheckCollisionRecs(player_rect, (*launchers)[i].Rect) {
+			player.Gravity = (*launchers)[i].Power
+			break
+		}
+	}
 }
