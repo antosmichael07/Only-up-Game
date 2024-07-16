@@ -4,7 +4,6 @@ import (
 	"sync"
 	"time"
 
-	lgr "github.com/antosmichael07/Go-Logger"
 	tcp "github.com/antosmichael07/Go-TCP-Connection"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
@@ -16,11 +15,7 @@ const (
 	event_player_leave
 )
 
-func connection(players *[]Player, wg *sync.WaitGroup, player_num *byte, remove_player *byte) {
-	client := tcp.NewClient("192.168.1.127:8080")
-	client.Logger.Level = lgr.Warning
-	client.Connect()
-
+func connection(players *[]Player, wg *sync.WaitGroup, player_num *byte, remove_player *byte, should_close_connection *bool, wg_disconnect *sync.WaitGroup, client *tcp.Client) {
 	wait_player_num := byte(255)
 
 	client.On(event_player_leave, func(data *[]byte) {
@@ -55,11 +50,11 @@ func connection(players *[]Player, wg *sync.WaitGroup, player_num *byte, remove_
 		(*players)[(*data)[15]].Keys[1] = (*data)[13]
 		(*players)[(*data)[15]].Keys[2] = (*data)[14]
 
-		if (*players)[(*data)[15]].Position.X+15 < x || (*players)[(*data)[15]].Position.X-15 > x {
+		if (*players)[(*data)[15]].Position.X+50 < x || (*players)[(*data)[15]].Position.X-50 > x {
 			(*players)[(*data)[15]].Position.X = x
 		}
 
-		if (*players)[(*data)[15]].Position.Y+15 < y || (*players)[(*data)[15]].Position.Y-15 > y {
+		if (*players)[(*data)[15]].Position.Y+50 < y || (*players)[(*data)[15]].Position.Y-50 > y {
 			(*players)[(*data)[15]].Position.Y = y
 		}
 	})
@@ -70,16 +65,16 @@ func connection(players *[]Player, wg *sync.WaitGroup, player_num *byte, remove_
 		time.Sleep(200 * time.Millisecond)
 	}
 
-	data_sending(&client, players, player_num)
+	data_sending(client, players, player_num, should_close_connection, wg_disconnect)
 }
 
-func data_sending(client *tcp.Client, players *[]Player, player_num *byte) {
+func data_sending(client *tcp.Client, players *[]Player, player_num *byte, should_close_connection *bool, wg_disconnect *sync.WaitGroup) {
 	last_position := rl.NewVector2(0, 0)
 	last_direction := int8(0)
 	last_gravity := float32(0)
 	last_input := [3]byte{0, 0, 0}
 
-	for !rl.WindowShouldClose() {
+	for !rl.WindowShouldClose() && !*should_close_connection {
 		if last_position.X != (*players)[*player_num].Position.X || last_position.Y != (*players)[*player_num].Position.Y || last_direction != (*players)[*player_num].Direction || last_gravity != (*players)[*player_num].Gravity || last_input[0] != (*players)[*player_num].Keys[0] || last_input[1] != (*players)[*player_num].Keys[1] || last_input[2] != (*players)[*player_num].Keys[2] {
 			send_data(client, players, player_num)
 		}
@@ -91,6 +86,9 @@ func data_sending(client *tcp.Client, players *[]Player, player_num *byte) {
 
 		time.Sleep(20 * time.Millisecond)
 	}
+
+	client.Disconnect()
+	wg_disconnect.Done()
 }
 
 func send_data(client *tcp.Client, players *[]Player, player_num *byte) {

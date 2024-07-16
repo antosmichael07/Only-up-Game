@@ -82,15 +82,15 @@ func (player *Player) Draw(textures *[3]rl.Texture2D) {
 		return
 	}
 
-	if player.AnimationTimer < 5 {
+	if player.AnimationTimer < 4 {
 		rl.DrawTexture((*textures)[1], int32(player.Position.X), int32(player.Position.Y), rl.White)
-	} else if player.AnimationTimer < 10 {
+	} else if player.AnimationTimer < 8 {
 		rl.DrawTexture((*textures)[2], int32(player.Position.X), int32(player.Position.Y), rl.White)
-	} else if player.AnimationTimer < 15 {
+	} else if player.AnimationTimer < 12 {
 		rl.DrawTexture((*textures)[0], int32(player.Position.X), int32(player.Position.Y), rl.White)
 	} else {
 		rl.DrawTexture((*textures)[1], int32(player.Position.X), int32(player.Position.Y), rl.White)
-		player.AnimationTimer -= 15
+		player.AnimationTimer -= 12
 	}
 }
 

@@ -14,7 +14,7 @@ const (
 
 func main() {
 	server := tcp.NewServer("192.168.1.127:8080")
-	server.Logger.Level = lgr.Warning
+	server.Logger.Level = lgr.None
 	players := map[[64]byte]byte{}
 
 	server.On(event_player_change, func(data *[]byte, conn *tcp.Connection) {

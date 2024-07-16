@@ -1,10 +1,8 @@
 package main
 
-import rl "github.com/gen2brain/raylib-go/raylib"
-
 func main() {
+	should_close_connection := false
 	init_window()
-	game_loop()
 
-	rl.CloseWindow()
+	main_menu(&should_close_connection)
 }

@@ -3,6 +3,7 @@ package main
 import (
 	"sync"
 
+	tcp "github.com/antosmichael07/Go-TCP-Connection"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
@@ -50,17 +51,20 @@ func init_game() ([]Player, []rl.Rectangle, []SideLauncher, []Launcher, rl.Camer
 	return players, collision_rects, side_launchers, launchers, camera, player_textures
 }
 
-func game_loop() {
+func game_loop(should_close_connection *bool, client *tcp.Client) {
 	players, collision_rects, jumpers, side_launchers, camera, player_textures := init_game()
 	player_num := byte(255)
 	remove_player := byte(255)
 
+	var wg_disconnect sync.WaitGroup
+	wg_disconnect.Add(2)
+
 	var wg sync.WaitGroup
 	wg.Add(1)
-	go connection(&players, &wg, &player_num, &remove_player)
+	go connection(&players, &wg, &player_num, &remove_player, should_close_connection, &wg_disconnect, client)
 	wg.Wait()
 
-	for !rl.WindowShouldClose() {
+	for !rl.WindowShouldClose() && !*should_close_connection {
 		window_manager()
 		rl.BeginDrawing()
 		rl.ClearBackground(rl.SkyBlue)
@@ -92,9 +96,28 @@ func game_loop() {
 			}
 			remove_player = 255
 		}
+
+		if rl.IsKeyPressed(rl.KeyEscape) {
+			disconnect(should_close_connection)
+		}
 	}
+	wg_disconnect.Done()
+
+	wg_disconnect.Wait()
+
+	*should_close_connection = false
+	for i := 0; i < len(player_textures); i++ {
+		for j := 0; j < len(player_textures[i]); j++ {
+			rl.UnloadTexture(player_textures[i][j])
+		}
+	}
+	main_menu(should_close_connection)
 }
 
 func update_camera(players *[]Player, camera *rl.Camera2D, player_num *byte) {
 	camera.Target.Y = rl.Lerp(camera.Target.Y, (*players)[*player_num].Position.Y, 0.05*(*players)[*player_num].FrameTime)
+}
+
+func disconnect(should_close_connection *bool) {
+	*should_close_connection = true
 }
