@@ -6,9 +6,8 @@ import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
-func init_game() (Player, Player, []rl.Rectangle, []SideLauncher, []Launcher, rl.Camera2D) {
-	player := NewPlayer()
-	player_2 := NewPlayer()
+func init_game() ([]Player, []rl.Rectangle, []SideLauncher, []Launcher, rl.Camera2D, [][3]rl.Texture2D) {
+	players := []Player{}
 
 	collision_rects := []rl.Rectangle{
 		rl.NewRectangle(25, 125, 250, 25),
@@ -23,17 +22,42 @@ func init_game() (Player, Player, []rl.Rectangle, []SideLauncher, []Launcher, rl
 		{rl.NewRectangle(25, 100, 25, 25), -8},
 	}
 
-	camera := rl.NewCamera2D(rl.NewVector2(float32(rl.GetScreenWidth()/2), float32(rl.GetScreenHeight()/2)), rl.NewVector2(225, player.Position.Y-200), 0, 4)
+	camera := rl.NewCamera2D(rl.NewVector2(float32(rl.GetScreenWidth()/2), float32(rl.GetScreenHeight()/2)), rl.NewVector2(225, 0), 0, 4)
 
-	return player, player_2, collision_rects, side_launchers, launchers, camera
+	player_textures := [][3]rl.Texture2D{
+		{
+			rl.LoadTexture("resources/textures/player_00.png"),
+			rl.LoadTexture("resources/textures/player_01.png"),
+			rl.LoadTexture("resources/textures/player_02.png"),
+		},
+		{
+			rl.LoadTexture("resources/textures/player_10.png"),
+			rl.LoadTexture("resources/textures/player_11.png"),
+			rl.LoadTexture("resources/textures/player_12.png"),
+		},
+		{
+			rl.LoadTexture("resources/textures/player_scream_00.png"),
+			rl.LoadTexture("resources/textures/player_scream_01.png"),
+			rl.LoadTexture("resources/textures/player_scream_02.png"),
+		},
+		{
+			rl.LoadTexture("resources/textures/player_scream_10.png"),
+			rl.LoadTexture("resources/textures/player_scream_11.png"),
+			rl.LoadTexture("resources/textures/player_scream_12.png"),
+		},
+	}
+
+	return players, collision_rects, side_launchers, launchers, camera, player_textures
 }
 
 func game_loop() {
-	player, player_2, collision_rects, jumpers, side_launchers, camera := init_game()
+	players, collision_rects, jumpers, side_launchers, camera, player_textures := init_game()
+	player_num := byte(255)
+	remove_player := byte(255)
 
 	var wg sync.WaitGroup
 	wg.Add(1)
-	go connection(&player, &player_2, &wg)
+	go connection(&players, &wg, &player_num, &remove_player)
 	wg.Wait()
 
 	for !rl.WindowShouldClose() {
@@ -41,11 +65,12 @@ func game_loop() {
 		rl.BeginDrawing()
 		rl.ClearBackground(rl.SkyBlue)
 		rl.BeginMode2D(camera)
-		update_camera(&player, &camera)
+		update_camera(&players, &camera, &player_num)
 
-		player.Input()
-		player.Update(&collision_rects, &jumpers, &side_launchers)
-		player_2.Update(&collision_rects, &jumpers, &side_launchers)
+		players[player_num].Input()
+		for i := 0; i < len(players); i++ {
+			players[i].Update(&collision_rects, &jumpers, &side_launchers, &player_textures)
+		}
 
 		for i := 0; i < len(collision_rects); i++ {
 			rl.DrawRectangleRec(collision_rects[i], rl.Black)
@@ -59,9 +84,17 @@ func game_loop() {
 
 		rl.EndMode2D()
 		rl.EndDrawing()
+
+		if remove_player != 255 {
+			players = append(players[:remove_player], players[remove_player+1:]...)
+			if player_num > remove_player {
+				player_num--
+			}
+			remove_player = 255
+		}
 	}
 }
 
-func update_camera(player *Player, camera *rl.Camera2D) {
-	camera.Target.Y = rl.Lerp(camera.Target.Y, player.Position.Y, 0.05*player.FrameTime)
+func update_camera(players *[]Player, camera *rl.Camera2D, player_num *byte) {
+	camera.Target.Y = rl.Lerp(camera.Target.Y, (*players)[*player_num].Position.Y, 0.05*(*players)[*player_num].FrameTime)
 }

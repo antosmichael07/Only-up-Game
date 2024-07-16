@@ -1,14 +1,12 @@
 package main
 
-import rl "github.com/gen2brain/raylib-go/raylib"
+import (
+	rl "github.com/gen2brain/raylib-go/raylib"
+)
 
 type Player struct {
 	Position           rl.Vector2
 	Scale              rl.Vector2
-	Texture0           [3]rl.Texture2D
-	Texture1           [3]rl.Texture2D
-	TextureScream0     [3]rl.Texture2D
-	TextureScream1     [3]rl.Texture2D
 	Speed              float32
 	Acceleration       float32
 	Gravity            float32
@@ -36,18 +34,6 @@ func NewPlayer() Player {
 	player := Player{}
 	player.Position = rl.NewVector2(100, 100)
 	player.Scale = rl.NewVector2(21, 25)
-	player.Texture0[0] = rl.LoadTexture("resources/textures/player_00.png")
-	player.Texture0[1] = rl.LoadTexture("resources/textures/player_01.png")
-	player.Texture0[2] = rl.LoadTexture("resources/textures/player_02.png")
-	player.Texture1[0] = rl.LoadTexture("resources/textures/player_10.png")
-	player.Texture1[1] = rl.LoadTexture("resources/textures/player_11.png")
-	player.Texture1[2] = rl.LoadTexture("resources/textures/player_12.png")
-	player.TextureScream0[0] = rl.LoadTexture("resources/textures/player_scream_00.png")
-	player.TextureScream0[1] = rl.LoadTexture("resources/textures/player_scream_01.png")
-	player.TextureScream0[2] = rl.LoadTexture("resources/textures/player_scream_02.png")
-	player.TextureScream1[0] = rl.LoadTexture("resources/textures/player_scream_10.png")
-	player.TextureScream1[1] = rl.LoadTexture("resources/textures/player_scream_11.png")
-	player.TextureScream1[2] = rl.LoadTexture("resources/textures/player_scream_12.png")
 	player.Speed = 2.
 	player.Gravity = 0.
 	player.GravityPower = .125
@@ -61,30 +47,30 @@ func NewPlayer() Player {
 	return player
 }
 
-func (player *Player) Update(collision_rects *[]rl.Rectangle, side_launchers *[]SideLauncher, launchers *[]Launcher) {
+func (player *Player) Update(collision_rects *[]rl.Rectangle, side_launchers *[]SideLauncher, launchers *[]Launcher, player_textures *[][3]rl.Texture2D) {
 	player.FrameTime = rl.GetFrameTime() * 60
 
 	player.Movement(collision_rects)
 	player.Fall(collision_rects)
 	player.SideLauncher(side_launchers)
 	player.Launcher(launchers)
-	player.Drawing()
+	player.Drawing(player_textures)
 }
 
-func (player *Player) Drawing() {
+func (player *Player) Drawing(player_textures *[][3]rl.Texture2D) {
 	player.AnimationTimer += player.FrameTime
 
 	if player.Direction < 0 {
 		if player.Gravity < 2.5 {
-			player.Draw(&player.Texture0)
+			player.Draw(&(*player_textures)[0])
 		} else {
-			player.Draw(&player.TextureScream0)
+			player.Draw(&(*player_textures)[2])
 		}
 	} else {
 		if player.Gravity < 2.5 {
-			player.Draw(&player.Texture1)
+			player.Draw(&(*player_textures)[1])
 		} else {
-			player.Draw(&player.TextureScream1)
+			player.Draw(&(*player_textures)[3])
 		}
 	}
 }

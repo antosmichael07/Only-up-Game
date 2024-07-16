@@ -1,9 +1,7 @@
 github.com/antosmichael07/Go-Logger v1.17.0 h1:rXpsW3rs7kZDWzOOpn856Q0YQw+oDm6mScBDkN4xD8Y=
 github.com/antosmichael07/Go-Logger v1.17.0/go.mod h1:v+v085J0A+Cdi76SanfvKA10216jy45azC6VM+sh16Q=
-github.com/antosmichael07/Go-TCP-Connection v1.50.4 h1:lYGuszCE/9udNSUujJ1rGiu685f0QM+WXoTSQPkDj6A=
-github.com/antosmichael07/Go-TCP-Connection v1.50.4/go.mod h1:MpT2kgBQb7g26V6q1fa1pyznn9siEF4rSgMx9yfIhqc=
-github.com/antosmichael07/Go-TCP-Connection v1.50.5 h1:hMhcrur5BMCLp3b4AzDm1+GJKGlcL9lpxoH/8Kdsve8=
-github.com/antosmichael07/Go-TCP-Connection v1.50.5/go.mod h1:MpT2kgBQb7g26V6q1fa1pyznn9siEF4rSgMx9yfIhqc=
+github.com/antosmichael07/Go-TCP-Connection v1.50.6 h1:bSPOkHjrXfj4oGaEPq3SSZdGh14HU2lkzN01zQVWmuw=
+github.com/antosmichael07/Go-TCP-Connection v1.50.6/go.mod h1:MpT2kgBQb7g26V6q1fa1pyznn9siEF4rSgMx9yfIhqc=
 github.com/ebitengine/purego v0.7.1 h1:6/55d26lG3o9VCZX8lping+bZcmShseiqlh2bnUDiPA=
 github.com/ebitengine/purego v0.7.1/go.mod h1:ah1In8AOtksoNK6yk5z1HTJeUkC1Ez4Wk2idgGslMwQ=
 github.com/gen2brain/raylib-go/raylib v0.0.0-20240628125141-62016ee92fc0 h1:mhWZabwn9WvzqMBgiuW8ewuQ4Zg+PfW+XbNnTtIX1FY=
