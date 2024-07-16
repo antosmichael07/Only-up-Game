@@ -1,6 +1,7 @@
 package main
 
 import (
+	tcp "github.com/antosmichael07/Go-TCP-Connection"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
@@ -47,7 +48,7 @@ func NewPlayer() Player {
 	return player
 }
 
-func (player *Player) Update(collision_rects *[]rl.Rectangle, side_launchers *[]SideLauncher, launchers *[]Launcher, player_textures *[][3]rl.Texture2D) {
+func (player *Player) Update(collision_rects *[]rl.Rectangle, side_launchers *[]SideLauncher, launchers *[]Launcher, player_textures *[][3]rl.Texture2D, players *[]Player) {
 	player.FrameTime = rl.GetFrameTime() * 60
 
 	player.Movement(collision_rects)
@@ -209,6 +210,26 @@ func (player *Player) Launcher(launchers *[]Launcher) {
 		if rl.CheckCollisionRecs(player_rect, (*launchers)[i].Rect) {
 			player.Gravity = (*launchers)[i].Power
 			break
+		}
+	}
+}
+
+func (player *Player) Kick(players *[]Player, player_num *byte, client *tcp.Client) {
+	if rl.IsKeyPressed(rl.KeySpace) {
+		player_rect := rl.NewRectangle(player.Position.X, player.Position.Y, player.Scale.X, player.Scale.Y)
+
+		for i := 0; i < len(*players); i++ {
+			if i == int(*player_num) {
+				continue
+			}
+
+			other_player_rect := rl.NewRectangle((*players)[i].Position.X, (*players)[i].Position.Y, (*players)[i].Scale.X, (*players)[i].Scale.Y)
+
+			if rl.CheckCollisionRecs(player_rect, other_player_rect) {
+				to_send := append([]byte{byte(i)}, float32_to_bytes((*players)[i].SideLauncherPower+(6*float32((*player).Direction)))...)
+				client.SendData(event_player_kick, &to_send)
+				break
+			}
 		}
 	}
 }

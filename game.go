@@ -64,7 +64,7 @@ func game_loop(should_close_connection *bool, client *tcp.Client) {
 	go connection(&players, &wg, &player_num, &remove_player, should_close_connection, &wg_disconnect, client)
 	wg.Wait()
 
-	for !rl.WindowShouldClose() && !*should_close_connection {
+	for !*should_close_connection {
 		window_manager()
 		rl.BeginDrawing()
 		rl.ClearBackground(rl.SkyBlue)
@@ -73,8 +73,9 @@ func game_loop(should_close_connection *bool, client *tcp.Client) {
 
 		players[player_num].Input()
 		for i := 0; i < len(players); i++ {
-			players[i].Update(&collision_rects, &jumpers, &side_launchers, &player_textures)
+			players[i].Update(&collision_rects, &jumpers, &side_launchers, &player_textures, &players)
 		}
+		players[player_num].Kick(&players, &player_num, client)
 
 		for i := 0; i < len(collision_rects); i++ {
 			rl.DrawRectangleRec(collision_rects[i], rl.Black)
@@ -98,7 +99,7 @@ func game_loop(should_close_connection *bool, client *tcp.Client) {
 		}
 
 		if rl.IsKeyPressed(rl.KeyEscape) {
-			disconnect(should_close_connection)
+			*should_close_connection = true
 		}
 	}
 	wg_disconnect.Done()
@@ -111,13 +112,8 @@ func game_loop(should_close_connection *bool, client *tcp.Client) {
 			rl.UnloadTexture(player_textures[i][j])
 		}
 	}
-	main_menu(should_close_connection)
 }
 
 func update_camera(players *[]Player, camera *rl.Camera2D, player_num *byte) {
 	camera.Target.Y = rl.Lerp(camera.Target.Y, (*players)[*player_num].Position.Y, 0.05*(*players)[*player_num].FrameTime)
-}
-
-func disconnect(should_close_connection *bool) {
-	*should_close_connection = true
 }

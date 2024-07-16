@@ -10,15 +10,20 @@ const (
 	event_player_num
 	event_new_player
 	event_player_leave
+	event_player_kick
 )
 
 func main() {
-	server := tcp.NewServer("192.168.1.127:8080")
+	server := tcp.NewServer("127.0.0.1:8080")
 	server.Logger.Level = lgr.None
 	players := map[[64]byte]byte{}
 
 	server.On(event_player_change, func(data *[]byte, conn *tcp.Connection) {
 		server.SendDataToAll(event_player_change, data)
+	})
+
+	server.On(event_player_kick, func(data *[]byte, conn *tcp.Connection) {
+		server.SendDataToAll(event_player_kick, data)
 	})
 
 	server.OnConnect(func(conn *tcp.Connection) {

@@ -13,6 +13,7 @@ const (
 	event_player_num
 	event_new_player
 	event_player_leave
+	event_player_kick
 )
 
 func connection(players *[]Player, wg *sync.WaitGroup, player_num *byte, remove_player *byte, should_close_connection *bool, wg_disconnect *sync.WaitGroup, client *tcp.Client) {
@@ -57,6 +58,10 @@ func connection(players *[]Player, wg *sync.WaitGroup, player_num *byte, remove_
 		if (*players)[(*data)[15]].Position.Y+50 < y || (*players)[(*data)[15]].Position.Y-50 > y {
 			(*players)[(*data)[15]].Position.Y = y
 		}
+	})
+
+	client.On(event_player_kick, func(data *[]byte) {
+		(*players)[(*data)[0]].SideLauncherPower = bytes_to_float32((*data)[1:])
 	})
 
 	go client.Listen()
