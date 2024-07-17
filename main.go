@@ -20,11 +20,13 @@ func main() {
 	buttons.NewButtonType(&button_normal, &button_focused, &button_pressed)
 	buttons.NewButtonType(&button_normal, &button_focused, &button_pressed)
 	buttons.NewButtonType(&clear_normal, &clear_focused, &clear_pressed)
+	buttons.NewButtonType(&button_normal, &button_focused, &button_pressed)
 
 	should_close_connection := false
 	stop_trying_to_connect := false
+	back_from_credits := false
 	ip := ""
-	init_buttons(&buttons, &input_box, &should_close_connection, &stop_trying_to_connect, &ip)
+	init_buttons(&buttons, &input_box, &should_close_connection, &stop_trying_to_connect, &ip, &back_from_credits)
 
 	main_menu(&buttons)
 }

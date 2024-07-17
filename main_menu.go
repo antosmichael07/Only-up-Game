@@ -2,7 +2,7 @@ package main
 
 import (
 	"os"
-	"time"
+	"os/exec"
 
 	lgr "github.com/antosmichael07/Go-Logger"
 	tcp "github.com/antosmichael07/Go-TCP-Connection"
@@ -21,7 +21,7 @@ func main_menu(buttons *Buttons) {
 	}
 }
 
-func init_buttons(buttons *Buttons, input_box *rl.Texture2D, should_close_connection *bool, stop_trying_to_connect *bool, ip *string) {
+func init_buttons(buttons *Buttons, input_box *rl.Texture2D, should_close_connection *bool, stop_trying_to_connect *bool, ip *string, back_from_credits *bool) {
 	buttons.b_types[0].NewButton("join", int32(rl.GetScreenWidth()/2)-300, 100, "JOIN", 60, func(button *Button) {
 		*stop_trying_to_connect = false
 
@@ -59,12 +59,22 @@ func init_buttons(buttons *Buttons, input_box *rl.Texture2D, should_close_connec
 		}
 	})
 	buttons.b_types[0].NewButton("credits", int32(rl.GetScreenWidth()/2)-300, 300, "CREDITS", 60, func(button *Button) {
+		*back_from_credits = false
 		rl.EndDrawing()
-		rl.BeginDrawing()
-		rl.ClearBackground(rl.SkyBlue)
-		rl.DrawText("Made by Mispul", int32(rl.GetScreenWidth()/2)-rl.MeasureText("Made by Mispul", 60)/2, 400, 60, rl.Black)
-		rl.EndDrawing()
-		time.Sleep(3 * time.Second)
+
+		for !*back_from_credits {
+			window_manager()
+			rl.BeginDrawing()
+			rl.ClearBackground(rl.SkyBlue)
+
+			rl.DrawTexture(*input_box, int32(rl.GetScreenWidth()/2)-500, 100, rl.White)
+			rl.DrawText("Made By Mispul", int32(rl.GetScreenWidth()/2)-rl.MeasureText("Made By Mispul", 60)/2, 145, 60, rl.Black)
+
+			buttons.Draw(3)
+
+			rl.EndDrawing()
+		}
+
 		rl.BeginDrawing()
 	})
 	buttons.b_types[0].NewButton("quit", int32(rl.GetScreenWidth()/2)-300, int32(rl.GetScreenHeight())-250, "QUIT", 60, func(button *Button) {
@@ -83,6 +93,14 @@ func init_buttons(buttons *Buttons, input_box *rl.Texture2D, should_close_connec
 
 	buttons.b_types[2].NewButton("clear-input-box", int32(rl.GetScreenWidth()/2)+550, 100, "", 60, func(button *Button) {
 		*ip = ""
+	})
+
+	buttons.b_types[3].NewButton("github", int32(rl.GetScreenWidth()/2)-300, 400, "GITHUB", 60, func(button *Button) {
+		exec.Command("rundll32", "url.dll,FileProtocolHandler", "https://github.com/antosmichael07").Start()
+	})
+
+	buttons.b_types[3].NewButton("back-from-credits", int32(rl.GetScreenWidth()/2)-300, 600, "BACK", 60, func(button *Button) {
+		*back_from_credits = true
 	})
 }
 

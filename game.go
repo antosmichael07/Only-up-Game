@@ -12,16 +12,14 @@ func init_game() ([]Player, []rl.Rectangle, []SideLauncher, []Launcher, rl.Camer
 
 	collision_rects := []rl.Rectangle{
 		rl.NewRectangle(25, 125, 250, 25),
-		rl.NewRectangle(0, 400, 400, 25),
 	}
 
 	side_launchers := []SideLauncher{
+		{rl.NewRectangle(25, 100, 25, 25), 8},
 		{rl.NewRectangle(250, 100, 25, 25), -8},
 	}
 
-	launchers := []Launcher{
-		{rl.NewRectangle(25, 100, 25, 25), -8},
-	}
+	launchers := []Launcher{}
 
 	camera := rl.NewCamera2D(rl.NewVector2(float32(rl.GetScreenWidth()/2), float32(rl.GetScreenHeight()/2)), rl.NewVector2(225, 0), 0, 4)
 
