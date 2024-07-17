@@ -14,6 +14,7 @@ const (
 	event_new_player
 	event_player_leave
 	event_player_kick
+	event_i_wanna_leave
 )
 
 func connection(players *[]Player, wg *sync.WaitGroup, player_num *byte, remove_player *byte, should_close_connection *bool, wg_disconnect *sync.WaitGroup, client *tcp.Client) {
@@ -91,6 +92,8 @@ func data_sending(client *tcp.Client, players *[]Player, player_num *byte, shoul
 
 		time.Sleep(20 * time.Millisecond)
 	}
+
+	client.SendData(event_i_wanna_leave, &[]byte{})
 
 	client.Disconnect()
 	wg_disconnect.Done()

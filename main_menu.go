@@ -34,6 +34,10 @@ func init_buttons(buttons *Buttons, input_box *rl.Texture2D, should_close_connec
 				*ip += string(char)
 			}
 
+			if rl.IsKeyDown(rl.KeyLeftControl) && rl.IsKeyPressed(rl.KeyV) {
+				*ip += rl.GetClipboardText()
+			}
+
 			rl.DrawTexture(*input_box, int32(rl.GetScreenWidth()/2)-500, 100, rl.White)
 			rl.DrawText(*ip, int32(rl.GetScreenWidth()/2)-rl.MeasureText(*ip, 60)/2, 145, 60, rl.Black)
 
@@ -60,8 +64,10 @@ func init_buttons(buttons *Buttons, input_box *rl.Texture2D, should_close_connec
 	})
 
 	buttons.b_types[1].NewButton("connect", int32(rl.GetScreenWidth()/2)-300, 400, "CONNECT", 60, func(button *Button) {
+		rl.EndDrawing()
 		connect(ip, should_close_connection)
 		*stop_trying_to_connect = true
+		rl.BeginDrawing()
 	})
 	buttons.b_types[1].NewButton("back-from-connecting", int32(rl.GetScreenWidth()/2)-300, 600, "BACK", 60, func(button *Button) {
 		*stop_trying_to_connect = true
@@ -70,7 +76,7 @@ func init_buttons(buttons *Buttons, input_box *rl.Texture2D, should_close_connec
 
 func connect(ip *string, should_close_connection *bool) {
 	client := tcp.NewClient(*ip)
-	client.Logger.Level = lgr.None
+	client.Logger.Level = lgr.Info
 
 	rl.BeginDrawing()
 	rl.ClearBackground(rl.SkyBlue)
