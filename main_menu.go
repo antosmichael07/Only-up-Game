@@ -2,6 +2,7 @@ package main
 
 import (
 	"os"
+	"time"
 
 	lgr "github.com/antosmichael07/Go-Logger"
 	tcp "github.com/antosmichael07/Go-TCP-Connection"
@@ -58,7 +59,13 @@ func init_buttons(buttons *Buttons, input_box *rl.Texture2D, should_close_connec
 		}
 	})
 	buttons.b_types[0].NewButton("credits", int32(rl.GetScreenWidth()/2)-300, 300, "CREDITS", 60, func(button *Button) {
-
+		rl.EndDrawing()
+		rl.BeginDrawing()
+		rl.ClearBackground(rl.SkyBlue)
+		rl.DrawText("Made by Mispul", int32(rl.GetScreenWidth()/2)-rl.MeasureText("Made by Mispul", 60)/2, 400, 60, rl.Black)
+		rl.EndDrawing()
+		time.Sleep(3 * time.Second)
+		rl.BeginDrawing()
 	})
 	buttons.b_types[0].NewButton("quit", int32(rl.GetScreenWidth()/2)-300, int32(rl.GetScreenHeight())-250, "QUIT", 60, func(button *Button) {
 		os.Exit(0)
