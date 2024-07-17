@@ -56,6 +56,7 @@ func init_buttons(buttons *Buttons, input_box *rl.Texture2D, should_close_connec
 
 		if rl.IsKeyPressed(rl.KeyEnter) || rl.IsKeyPressed(rl.KeyKpEnter) {
 			connect(ip, should_close_connection)
+			*stop_trying_to_connect = true
 		}
 	})
 	buttons.b_types[0].NewButton("credits", int32(rl.GetScreenWidth()/2)-300, 300, "CREDITS", 60, func(button *Button) {
@@ -106,7 +107,7 @@ func init_buttons(buttons *Buttons, input_box *rl.Texture2D, should_close_connec
 
 func connect(ip *string, should_close_connection *bool) {
 	client := tcp.NewClient(*ip)
-	client.Logger.Level = lgr.Info
+	client.Logger.Level = lgr.None
 
 	rl.BeginDrawing()
 	rl.ClearBackground(rl.SkyBlue)

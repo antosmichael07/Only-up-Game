@@ -51,6 +51,7 @@ func connection(players *[]Player, wg *sync.WaitGroup, player_num *byte, remove_
 		(*players)[(*data)[15]].Keys[0] = (*data)[12]
 		(*players)[(*data)[15]].Keys[1] = (*data)[13]
 		(*players)[(*data)[15]].Keys[2] = (*data)[14]
+		(*players)[(*data)[15]].SideLauncherPower = bytes_to_float32((*data)[16:])
 
 		if (*players)[(*data)[15]].Position.X+50 < x || (*players)[(*data)[15]].Position.X-50 > x {
 			(*players)[(*data)[15]].Position.X = x
@@ -79,9 +80,10 @@ func data_sending(client *tcp.Client, players *[]Player, player_num *byte, shoul
 	last_direction := int8(0)
 	last_gravity := float32(0)
 	last_input := [3]byte{0, 0, 0}
+	last_side_launcher_power := float32(0)
 
-	for !rl.WindowShouldClose() && !*should_close_connection {
-		if last_position.X != (*players)[*player_num].Position.X || last_position.Y != (*players)[*player_num].Position.Y || last_direction != (*players)[*player_num].Direction || last_gravity != (*players)[*player_num].Gravity || last_input[0] != (*players)[*player_num].Keys[0] || last_input[1] != (*players)[*player_num].Keys[1] || last_input[2] != (*players)[*player_num].Keys[2] {
+	for !*should_close_connection {
+		if last_position.X != (*players)[*player_num].Position.X || last_position.Y != (*players)[*player_num].Position.Y || last_direction != (*players)[*player_num].Direction || last_gravity != (*players)[*player_num].Gravity || last_input[0] != (*players)[*player_num].Keys[0] || last_input[1] != (*players)[*player_num].Keys[1] || last_input[2] != (*players)[*player_num].Keys[2] || last_side_launcher_power != (*players)[*player_num].SideLauncherPower {
 			send_data(client, players, player_num)
 		}
 
@@ -89,6 +91,7 @@ func data_sending(client *tcp.Client, players *[]Player, player_num *byte, shoul
 		last_direction = (*players)[*player_num].Direction
 		last_gravity = (*players)[*player_num].Gravity
 		last_input = (*players)[*player_num].Keys
+		last_side_launcher_power = (*players)[*player_num].SideLauncherPower
 
 		time.Sleep(20 * time.Millisecond)
 	}
@@ -100,10 +103,11 @@ func data_sending(client *tcp.Client, players *[]Player, player_num *byte, shoul
 }
 
 func send_data(client *tcp.Client, players *[]Player, player_num *byte) {
-	data := make([]byte, 16)
+	data := make([]byte, 20)
 	x := float32_to_bytes((*players)[*player_num].Position.X)
 	y := float32_to_bytes((*players)[*player_num].Position.Y)
 	gravity := float32_to_bytes((*players)[*player_num].Gravity)
+	side_launcher_power := float32_to_bytes((*players)[*player_num].SideLauncherPower)
 
 	copy(data[:4], x)
 	copy(data[4:8], y)
@@ -112,6 +116,7 @@ func send_data(client *tcp.Client, players *[]Player, player_num *byte) {
 	data[13] = (*players)[*player_num].Keys[1]
 	data[14] = (*players)[*player_num].Keys[2]
 	data[15] = *player_num
+	copy(data[16:], side_launcher_power)
 
 	client.SendData(event_player_change, &data)
 }

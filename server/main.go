@@ -16,7 +16,7 @@ const (
 
 func main() {
 	server := tcp.NewServer(":24680")
-	server.Logger.Level = lgr.Info
+	server.Logger.Level = lgr.None
 	players := map[[64]byte]byte{}
 
 	server.On(event_player_change, func(data *[]byte, conn *tcp.Connection) {
