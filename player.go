@@ -1,6 +1,8 @@
 package main
 
 import (
+	"time"
+
 	tcp "github.com/antosmichael07/Go-TCP-Connection"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
@@ -19,6 +21,7 @@ type Player struct {
 	FrameTime          float32
 	AnimationTimer     float32
 	Keys               [3]byte
+	Kicking            bool
 }
 
 type SideLauncher struct {
@@ -62,12 +65,28 @@ func (player *Player) Drawing(player_textures *[][3]rl.Texture2D) {
 	player.AnimationTimer += player.FrameTime
 
 	if player.Direction < 0 {
+		if player.Kicking {
+			rl.DrawTexture((*player_textures)[4][0], int32(player.Position.X), int32(player.Position.Y), rl.White)
+			go func() {
+				time.Sleep(500 * time.Millisecond)
+				player.Kicking = false
+			}()
+			return
+		}
 		if player.Gravity < 2.5 {
 			player.Draw(&(*player_textures)[0])
 		} else {
 			player.Draw(&(*player_textures)[2])
 		}
 	} else {
+		if player.Kicking {
+			rl.DrawTexture((*player_textures)[4][1], int32(player.Position.X), int32(player.Position.Y), rl.White)
+			go func() {
+				time.Sleep(500 * time.Millisecond)
+				player.Kicking = false
+			}()
+			return
+		}
 		if player.Gravity < 2.5 {
 			player.Draw(&(*player_textures)[1])
 		} else {
@@ -227,6 +246,7 @@ func (player *Player) Kick(players *[]Player, player_num *byte, client *tcp.Clie
 
 			if rl.CheckCollisionRecs(player_rect, other_player_rect) {
 				to_send := append([]byte{byte(i)}, float32_to_bytes((*players)[i].SideLauncherPower+(6*float32((*player).Direction)))...)
+				to_send = append(to_send, byte(*player_num))
 				client.SendData(event_player_kick, &to_send)
 				break
 			}

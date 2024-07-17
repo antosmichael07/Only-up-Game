@@ -44,6 +44,11 @@ func init_game() ([]Player, []rl.Rectangle, []SideLauncher, []Launcher, rl.Camer
 			rl.LoadTexture("resources/textures/player_scream_11.png"),
 			rl.LoadTexture("resources/textures/player_scream_12.png"),
 		},
+		{
+			rl.LoadTexture("resources/textures/player_kick_0.png"),
+			rl.LoadTexture("resources/textures/player_kick_1.png"),
+			rl.LoadTexture("resources/textures/player_kick_0.png"),
+		},
 	}
 
 	return players, collision_rects, side_launchers, launchers, camera, player_textures

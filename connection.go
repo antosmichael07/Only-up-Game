@@ -63,7 +63,8 @@ func connection(players *[]Player, wg *sync.WaitGroup, player_num *byte, remove_
 	})
 
 	client.On(event_player_kick, func(data *[]byte) {
-		(*players)[(*data)[0]].SideLauncherPower = bytes_to_float32((*data)[1:])
+		(*players)[(*data)[0]].SideLauncherPower = bytes_to_float32((*data)[1:5])
+		(*players)[(*data)[5]].Kicking = true
 	})
 
 	go client.Listen()
