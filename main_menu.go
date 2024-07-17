@@ -42,6 +42,7 @@ func init_buttons(buttons *Buttons, input_box *rl.Texture2D, should_close_connec
 			rl.DrawText(*ip, int32(rl.GetScreenWidth()/2)-rl.MeasureText(*ip, 60)/2, 145, 60, rl.Black)
 
 			buttons.Draw(1)
+			buttons.Draw(2)
 
 			rl.EndDrawing()
 
@@ -71,6 +72,10 @@ func init_buttons(buttons *Buttons, input_box *rl.Texture2D, should_close_connec
 	})
 	buttons.b_types[1].NewButton("back-from-connecting", int32(rl.GetScreenWidth()/2)-300, 600, "BACK", 60, func(button *Button) {
 		*stop_trying_to_connect = true
+	})
+
+	buttons.b_types[2].NewButton("clear-input-box", int32(rl.GetScreenWidth()/2)+550, 100, "", 60, func(button *Button) {
+		*ip = ""
 	})
 }
 
