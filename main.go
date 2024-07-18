@@ -26,7 +26,38 @@ func main() {
 	stop_trying_to_connect := false
 	back_from_credits := false
 	ip := ""
-	init_buttons(&buttons, &input_box, &should_close_connection, &stop_trying_to_connect, &ip, &back_from_credits)
+
+	player_textures := [][3]rl.Texture2D{
+		{
+			rl.LoadTexture("resources/textures/player_00.png"),
+			rl.LoadTexture("resources/textures/player_01.png"),
+			rl.LoadTexture("resources/textures/player_02.png"),
+		},
+		{
+			rl.LoadTexture("resources/textures/player_10.png"),
+			rl.LoadTexture("resources/textures/player_11.png"),
+			rl.LoadTexture("resources/textures/player_12.png"),
+		},
+		{
+			rl.LoadTexture("resources/textures/player_scream_00.png"),
+			rl.LoadTexture("resources/textures/player_scream_01.png"),
+			rl.LoadTexture("resources/textures/player_scream_02.png"),
+		},
+		{
+			rl.LoadTexture("resources/textures/player_scream_10.png"),
+			rl.LoadTexture("resources/textures/player_scream_11.png"),
+			rl.LoadTexture("resources/textures/player_scream_12.png"),
+		},
+		{
+			rl.LoadTexture("resources/textures/player_kick_0.png"),
+			rl.LoadTexture("resources/textures/player_kick_1.png"),
+			rl.LoadTexture("resources/textures/player_kick_0.png"),
+		},
+	}
+
+	arrow := rl.LoadTexture("resources/textures/arrow.png")
+
+	init_buttons(&buttons, &input_box, &should_close_connection, &stop_trying_to_connect, &ip, &back_from_credits, &player_textures, &arrow)
 
 	main_menu(&buttons)
 }

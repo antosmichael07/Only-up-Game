@@ -15,17 +15,17 @@ func main_menu(buttons *Buttons) {
 		rl.BeginDrawing()
 		rl.ClearBackground(rl.SkyBlue)
 
-		(*buttons).Draw(0)
+		buttons.Draw(0)
 
 		rl.EndDrawing()
 	}
 }
 
-func init_buttons(buttons *Buttons, input_box *rl.Texture2D, should_close_connection *bool, stop_trying_to_connect *bool, ip *string, back_from_credits *bool) {
+func init_buttons(buttons *Buttons, input_box *rl.Texture2D, should_close_connection *bool, stop_trying_to_connect *bool, ip *string, back_from_credits *bool, player_textures *[][3]rl.Texture2D, arrow *rl.Texture2D) {
 	buttons.b_types[0].NewButton("join", int32(rl.GetScreenWidth()/2)-300, 100, "JOIN", 60, func(button *Button) {
 		*stop_trying_to_connect = false
 
-		for !rl.IsKeyPressed(rl.KeyEnter) && !rl.IsKeyPressed(rl.KeyKpEnter) && !rl.IsKeyPressed(rl.KeyEscape) && !*stop_trying_to_connect {
+		for !*stop_trying_to_connect {
 			window_manager()
 			rl.BeginDrawing()
 			rl.ClearBackground(rl.SkyBlue)
@@ -52,11 +52,16 @@ func init_buttons(buttons *Buttons, input_box *rl.Texture2D, should_close_connec
 					*ip = (*ip)[:len(*ip)-1]
 				}
 			}
-		}
 
-		if rl.IsKeyPressed(rl.KeyEnter) || rl.IsKeyPressed(rl.KeyKpEnter) {
-			connect(ip, should_close_connection)
-			*stop_trying_to_connect = true
+			if rl.IsKeyPressed(rl.KeyEnter) || rl.IsKeyPressed(rl.KeyKpEnter) {
+				*should_close_connection = false
+				connect(ip, should_close_connection, player_textures, arrow)
+				*stop_trying_to_connect = true
+			}
+
+			if rl.IsKeyPressed(rl.KeyEscape) {
+				*stop_trying_to_connect = true
+			}
 		}
 	})
 	buttons.b_types[0].NewButton("credits", int32(rl.GetScreenWidth()/2)-300, 300, "CREDITS", 60, func(button *Button) {
@@ -74,6 +79,10 @@ func init_buttons(buttons *Buttons, input_box *rl.Texture2D, should_close_connec
 			buttons.Draw(3)
 
 			rl.EndDrawing()
+
+			if rl.IsKeyPressed(rl.KeyEscape) {
+				*back_from_credits = true
+			}
 		}
 
 		rl.BeginDrawing()
@@ -84,7 +93,8 @@ func init_buttons(buttons *Buttons, input_box *rl.Texture2D, should_close_connec
 
 	buttons.b_types[1].NewButton("connect", int32(rl.GetScreenWidth()/2)-300, 400, "CONNECT", 60, func(button *Button) {
 		rl.EndDrawing()
-		connect(ip, should_close_connection)
+		*should_close_connection = false
+		connect(ip, should_close_connection, player_textures, arrow)
 		*stop_trying_to_connect = true
 		rl.BeginDrawing()
 	})
@@ -105,7 +115,7 @@ func init_buttons(buttons *Buttons, input_box *rl.Texture2D, should_close_connec
 	})
 }
 
-func connect(ip *string, should_close_connection *bool) {
+func connect(ip *string, should_close_connection *bool, player_textures *[][3]rl.Texture2D, arrow *rl.Texture2D) {
 	client := tcp.NewClient(*ip)
 	client.Logger.Level = lgr.None
 
@@ -119,5 +129,5 @@ func connect(ip *string, should_close_connection *bool) {
 		return
 	}
 
-	game_loop(should_close_connection, &client)
+	game_loop(should_close_connection, &client, player_textures, arrow)
 }

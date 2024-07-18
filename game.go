@@ -7,7 +7,7 @@ import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
-func init_game() ([]Player, []rl.Rectangle, []SideLauncher, []Launcher, rl.Camera2D, [][3]rl.Texture2D) {
+func init_game() ([]Player, []rl.Rectangle, []SideLauncher, []Launcher, rl.Camera2D) {
 	players := []Player{}
 
 	collision_rects := []rl.Rectangle{
@@ -23,39 +23,11 @@ func init_game() ([]Player, []rl.Rectangle, []SideLauncher, []Launcher, rl.Camer
 
 	camera := rl.NewCamera2D(rl.NewVector2(float32(rl.GetScreenWidth()/2), float32(rl.GetScreenHeight()/2)), rl.NewVector2(225, 0), 0, 4)
 
-	player_textures := [][3]rl.Texture2D{
-		{
-			rl.LoadTexture("resources/textures/player_00.png"),
-			rl.LoadTexture("resources/textures/player_01.png"),
-			rl.LoadTexture("resources/textures/player_02.png"),
-		},
-		{
-			rl.LoadTexture("resources/textures/player_10.png"),
-			rl.LoadTexture("resources/textures/player_11.png"),
-			rl.LoadTexture("resources/textures/player_12.png"),
-		},
-		{
-			rl.LoadTexture("resources/textures/player_scream_00.png"),
-			rl.LoadTexture("resources/textures/player_scream_01.png"),
-			rl.LoadTexture("resources/textures/player_scream_02.png"),
-		},
-		{
-			rl.LoadTexture("resources/textures/player_scream_10.png"),
-			rl.LoadTexture("resources/textures/player_scream_11.png"),
-			rl.LoadTexture("resources/textures/player_scream_12.png"),
-		},
-		{
-			rl.LoadTexture("resources/textures/player_kick_0.png"),
-			rl.LoadTexture("resources/textures/player_kick_1.png"),
-			rl.LoadTexture("resources/textures/player_kick_0.png"),
-		},
-	}
-
-	return players, collision_rects, side_launchers, launchers, camera, player_textures
+	return players, collision_rects, side_launchers, launchers, camera
 }
 
-func game_loop(should_close_connection *bool, client *tcp.Client) {
-	players, collision_rects, jumpers, side_launchers, camera, player_textures := init_game()
+func game_loop(should_close_connection *bool, client *tcp.Client, player_textures *[][3]rl.Texture2D, arrow *rl.Texture2D) {
+	players, collision_rects, jumpers, side_launchers, camera := init_game()
 	player_num := byte(255)
 	remove_player := byte(255)
 
@@ -76,9 +48,10 @@ func game_loop(should_close_connection *bool, client *tcp.Client) {
 
 		players[player_num].Input()
 		for i := 0; i < len(players); i++ {
-			players[i].Update(&collision_rects, &jumpers, &side_launchers, &player_textures, &players)
+			players[i].Update(&collision_rects, &jumpers, &side_launchers, player_textures, &players)
 		}
 		players[player_num].Kick(&players, &player_num, client)
+		players[player_num].DrawArrow(arrow)
 
 		for i := 0; i < len(collision_rects); i++ {
 			rl.DrawRectangleRec(collision_rects[i], rl.Black)
@@ -108,13 +81,6 @@ func game_loop(should_close_connection *bool, client *tcp.Client) {
 	wg_disconnect.Done()
 
 	wg_disconnect.Wait()
-
-	*should_close_connection = false
-	for i := 0; i < len(player_textures); i++ {
-		for j := 0; j < len(player_textures[i]); j++ {
-			rl.UnloadTexture(player_textures[i][j])
-		}
-	}
 }
 
 func update_camera(players *[]Player, camera *rl.Camera2D, player_num *byte) {

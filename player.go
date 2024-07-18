@@ -253,3 +253,7 @@ func (player *Player) Kick(players *[]Player, player_num *byte, client *tcp.Clie
 		}
 	}
 }
+
+func (player *Player) DrawArrow(arrow *rl.Texture2D) {
+	rl.DrawTexture(*arrow, int32(player.Position.X)+7, int32(player.Position.Y)-6, rl.White)
+}
