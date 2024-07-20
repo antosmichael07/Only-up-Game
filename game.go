@@ -34,9 +34,12 @@ func game_loop(should_close_connection *bool, client *tcp.Client, player_texture
 	var wg_disconnect sync.WaitGroup
 	wg_disconnect.Add(2)
 
+	var wait_player_num_wg sync.WaitGroup
+	wait_player_num_wg.Add(1)
+
 	var wg sync.WaitGroup
 	wg.Add(1)
-	go connection(&players, &wg, &player_num, &remove_player, should_close_connection, &wg_disconnect, client)
+	go connection(&players, &wg, &player_num, &remove_player, should_close_connection, &wg_disconnect, client, &wait_player_num_wg)
 	wg.Wait()
 
 	for !*should_close_connection {

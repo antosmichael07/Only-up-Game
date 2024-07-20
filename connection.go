@@ -17,7 +17,7 @@ const (
 	event_i_wanna_leave
 )
 
-func connection(players *[]Player, wg *sync.WaitGroup, player_num *byte, remove_player *byte, should_close_connection *bool, wg_disconnect *sync.WaitGroup, client *tcp.Client) {
+func connection(players *[]Player, wg *sync.WaitGroup, player_num *byte, remove_player *byte, should_close_connection *bool, wg_disconnect *sync.WaitGroup, client *tcp.Client, wait_player_num_wg *sync.WaitGroup) {
 	wait_player_num := byte(255)
 
 	client.On(event_player_leave, func(data *[]byte) {
@@ -29,6 +29,7 @@ func connection(players *[]Player, wg *sync.WaitGroup, player_num *byte, remove_
 			for i := 0; i < int((*data)[0]); i++ {
 				*players = append(*players, NewPlayer())
 			}
+			wait_player_num_wg.Wait()
 			*player_num = wait_player_num
 			wg.Done()
 		} else {
@@ -38,6 +39,7 @@ func connection(players *[]Player, wg *sync.WaitGroup, player_num *byte, remove_
 
 	client.On(event_player_num, func(data *[]byte) {
 		wait_player_num = (*data)[0]
+		wait_player_num_wg.Done()
 	})
 
 	client.On(event_player_change, func(data *[]byte) {

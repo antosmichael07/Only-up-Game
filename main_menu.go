@@ -53,14 +53,13 @@ func init_buttons(buttons *Buttons, input_box *rl.Texture2D, should_close_connec
 				}
 			}
 
-			if rl.IsKeyPressed(rl.KeyEnter) || rl.IsKeyPressed(rl.KeyKpEnter) {
-				*should_close_connection = false
-				connect(ip, should_close_connection, player_textures, arrow)
+			if rl.IsKeyPressed(rl.KeyEscape) {
 				*stop_trying_to_connect = true
 			}
 
-			if rl.IsKeyPressed(rl.KeyEscape) {
-				*stop_trying_to_connect = true
+			if rl.IsKeyPressed(rl.KeyEnter) || rl.IsKeyPressed(rl.KeyKpEnter) {
+				*should_close_connection = false
+				connect(ip, should_close_connection, player_textures, arrow)
 			}
 		}
 	})
@@ -95,7 +94,6 @@ func init_buttons(buttons *Buttons, input_box *rl.Texture2D, should_close_connec
 		rl.EndDrawing()
 		*should_close_connection = false
 		connect(ip, should_close_connection, player_textures, arrow)
-		*stop_trying_to_connect = true
 		rl.BeginDrawing()
 	})
 	buttons.b_types[1].NewButton("back-from-connecting", int32(rl.GetScreenWidth()/2)-300, 600, "BACK", 60, func(button *Button) {
