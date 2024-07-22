@@ -33,11 +33,11 @@ func init_buttons(buttons *Buttons, input_box *rl.Texture2D, should_close_connec
 			rl.BeginDrawing()
 			rl.ClearBackground(rl.SkyBlue)
 
-			if rl.IsKeyPressed(rl.KeyRight) && *cursor < len(*ip) {
+			if (rl.IsKeyPressed(rl.KeyRight) || rl.IsKeyPressedRepeat(rl.KeyRight)) && *cursor < len(*ip) {
 				*cursor_timer = 0
 				*cursor++
 			}
-			if rl.IsKeyPressed(rl.KeyLeft) && *cursor > 0 {
+			if (rl.IsKeyPressed(rl.KeyLeft) || rl.IsKeyPressedRepeat(rl.KeyLeft)) && *cursor > 0 {
 				*cursor_timer = 0
 				*cursor--
 			}
@@ -65,7 +65,7 @@ func init_buttons(buttons *Buttons, input_box *rl.Texture2D, should_close_connec
 
 			rl.EndDrawing()
 
-			if rl.IsKeyPressed(rl.KeyBackspace) {
+			if rl.IsKeyPressedRepeat(rl.KeyBackspace) || rl.IsKeyPressed(rl.KeyBackspace) {
 				if *cursor > 0 {
 					*cursor_timer = 0
 					*ip = fmt.Sprintf("%s%s", (*ip)[:*cursor-1], (*ip)[*cursor:])
