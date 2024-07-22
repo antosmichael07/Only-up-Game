@@ -21,7 +21,7 @@ func main_menu(buttons *Buttons) {
 	}
 }
 
-func init_buttons(buttons *Buttons, input_box *rl.Texture2D, should_close_connection *bool, stop_trying_to_connect *bool, ip *string, back_from_credits *bool, player_textures *[][3]rl.Texture2D, arrow *rl.Texture2D) {
+func init_buttons(buttons *Buttons, input_box *rl.Texture2D, should_close_connection *bool, stop_trying_to_connect *bool, ip *string, back_from_credits *bool, player_textures *[][3]rl.Texture2D, arrow *rl.Texture2D, go_back *bool) {
 	buttons.b_types[0].NewButton("join", int32(rl.GetScreenWidth()/2)-300, 100, "JOIN", 60, func(button *Button) {
 		*stop_trying_to_connect = false
 
@@ -59,7 +59,7 @@ func init_buttons(buttons *Buttons, input_box *rl.Texture2D, should_close_connec
 
 			if rl.IsKeyPressed(rl.KeyEnter) || rl.IsKeyPressed(rl.KeyKpEnter) {
 				*should_close_connection = false
-				connect(ip, should_close_connection, player_textures, arrow)
+				connect(ip, should_close_connection, player_textures, arrow, go_back, buttons)
 			}
 		}
 	})
@@ -93,7 +93,7 @@ func init_buttons(buttons *Buttons, input_box *rl.Texture2D, should_close_connec
 	buttons.b_types[1].NewButton("connect", int32(rl.GetScreenWidth()/2)-300, 400, "CONNECT", 60, func(button *Button) {
 		rl.EndDrawing()
 		*should_close_connection = false
-		connect(ip, should_close_connection, player_textures, arrow)
+		connect(ip, should_close_connection, player_textures, arrow, go_back, buttons)
 		rl.BeginDrawing()
 	})
 	buttons.b_types[1].NewButton("back-from-connecting", int32(rl.GetScreenWidth()/2)-300, 600, "BACK", 60, func(button *Button) {
@@ -111,9 +111,13 @@ func init_buttons(buttons *Buttons, input_box *rl.Texture2D, should_close_connec
 	buttons.b_types[3].NewButton("back-from-credits", int32(rl.GetScreenWidth()/2)-300, 600, "BACK", 60, func(button *Button) {
 		*back_from_credits = true
 	})
+
+	buttons.b_types[4].NewButton("back-from-error", int32(rl.GetScreenWidth()/2)-300, 750, "BACK", 60, func(button *Button) {
+		*go_back = true
+	})
 }
 
-func connect(ip *string, should_close_connection *bool, player_textures *[][3]rl.Texture2D, arrow *rl.Texture2D) {
+func connect(ip *string, should_close_connection *bool, player_textures *[][3]rl.Texture2D, arrow *rl.Texture2D, go_back *bool, buttons *Buttons) {
 	client := tcp.NewClient(*ip)
 	client.Logger.Level = lgr.None
 
@@ -124,6 +128,39 @@ func connect(ip *string, should_close_connection *bool, player_textures *[][3]rl
 
 	err := client.Connect()
 	if err != nil {
+		*go_back = false
+
+		for !*go_back {
+			window_manager()
+			rl.BeginDrawing()
+			rl.ClearBackground(rl.SkyBlue)
+
+			iterations := 0
+			for i := 0; i < len(err.Error()); {
+				last_space := i
+				j := i
+				for j < len(err.Error()) && err.Error()[j] != '\n' && rl.MeasureText(err.Error()[i:j+1], 60) < int32(rl.GetScreenWidth())-200 {
+					if err.Error()[j] == ' ' {
+						last_space = j
+					}
+					j++
+				}
+
+				rl.DrawText(err.Error()[i:last_space], int32(rl.GetScreenWidth())/2-rl.MeasureText(err.Error()[i:last_space], 60)/2, 100+int32(70*iterations), 60, rl.Black)
+
+				i = last_space + 1
+				iterations++
+			}
+
+			buttons.Draw(4)
+
+			rl.EndDrawing()
+
+			if rl.IsKeyPressed(rl.KeyEscape) {
+				*go_back = true
+			}
+		}
+
 		return
 	}
 

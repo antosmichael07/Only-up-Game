@@ -1,6 +1,10 @@
 package main
 
-import rl "github.com/gen2brain/raylib-go/raylib"
+import (
+	"os"
+
+	rl "github.com/gen2brain/raylib-go/raylib"
+)
 
 var refresh_rate int32
 
@@ -29,5 +33,9 @@ func window_manager() {
 			rl.ToggleFullscreen()
 		}
 		rl.SetTargetFPS(30)
+	}
+
+	if rl.WindowShouldClose() {
+		os.Exit(0)
 	}
 }
