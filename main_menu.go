@@ -139,11 +139,15 @@ func connect(ip *string, should_close_connection *bool, player_textures *[][3]rl
 			for i := 0; i < len(err.Error()); {
 				last_space := i
 				j := i
-				for j < len(err.Error()) && err.Error()[j] != '\n' && rl.MeasureText(err.Error()[i:j+1], 60) < int32(rl.GetScreenWidth())-200 {
+				for err.Error()[j] != '\n' && rl.MeasureText(err.Error()[i:j+1], 60) < int32(rl.GetScreenWidth())-200 {
 					if err.Error()[j] == ' ' {
 						last_space = j
 					}
 					j++
+					if j == len(err.Error()) {
+						last_space = j
+						break
+					}
 				}
 
 				rl.DrawText(err.Error()[i:last_space], int32(rl.GetScreenWidth())/2-rl.MeasureText(err.Error()[i:last_space], 60)/2, 100+int32(70*iterations), 60, rl.Black)
