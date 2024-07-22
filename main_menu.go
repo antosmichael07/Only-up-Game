@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 
@@ -21,26 +22,43 @@ func main_menu(buttons *Buttons) {
 	}
 }
 
-func init_buttons(buttons *Buttons, input_box *rl.Texture2D, should_close_connection *bool, stop_trying_to_connect *bool, ip *string, back_from_credits *bool, player_textures *[][3]rl.Texture2D, arrow *rl.Texture2D, go_back *bool) {
+func init_buttons(buttons *Buttons, input_box *rl.Texture2D, should_close_connection *bool, stop_trying_to_connect *bool, ip *string, back_from_credits *bool, player_textures *[][3]rl.Texture2D, arrow *rl.Texture2D, go_back *bool, cursor *int, cursor_timer *float32) {
 	buttons.b_types[0].NewButton("join", int32(rl.GetScreenWidth()/2)-300, 100, "JOIN", 60, func(button *Button) {
+		*cursor_timer = 0.
 		*stop_trying_to_connect = false
+		*cursor = len(*ip)
 
 		for !*stop_trying_to_connect {
 			window_manager()
 			rl.BeginDrawing()
 			rl.ClearBackground(rl.SkyBlue)
 
+			if rl.IsKeyPressed(rl.KeyRight) && *cursor < len(*ip) {
+				*cursor_timer = 0
+				*cursor++
+			}
+			if rl.IsKeyPressed(rl.KeyLeft) && *cursor > 0 {
+				*cursor_timer = 0
+				*cursor--
+			}
+
 			char := rl.GetCharPressed()
 			if char != 0 {
-				*ip += string(char)
+				*cursor_timer = 0
+				*ip = fmt.Sprintf("%s%s%s", (*ip)[:*cursor], string(char), (*ip)[*cursor:])
+				*cursor++
 			}
 
 			if rl.IsKeyDown(rl.KeyLeftControl) && rl.IsKeyPressed(rl.KeyV) {
-				*ip += rl.GetClipboardText()
+				*cursor_timer = 0
+				*ip = fmt.Sprintf("%s%s%s", (*ip)[:*cursor], rl.GetClipboardText(), (*ip)[*cursor:])
 			}
 
 			rl.DrawTexture(*input_box, int32(rl.GetScreenWidth()/2)-500, 100, rl.White)
 			rl.DrawText(*ip, int32(rl.GetScreenWidth()/2)-rl.MeasureText(*ip, 60)/2, 145, 60, rl.Black)
+			if *cursor_timer < .5 {
+				rl.DrawRectangle(int32(rl.GetScreenWidth()/2)-rl.MeasureText(*ip, 60)/2+rl.MeasureText((*ip)[:*cursor], 60)+2, 145, 2, 60, rl.Black)
+			}
 
 			buttons.Draw(1)
 			buttons.Draw(2)
@@ -48,8 +66,10 @@ func init_buttons(buttons *Buttons, input_box *rl.Texture2D, should_close_connec
 			rl.EndDrawing()
 
 			if rl.IsKeyPressed(rl.KeyBackspace) {
-				if len(*ip) > 0 {
-					*ip = (*ip)[:len(*ip)-1]
+				if *cursor > 0 {
+					*cursor_timer = 0
+					*ip = fmt.Sprintf("%s%s", (*ip)[:*cursor-1], (*ip)[*cursor:])
+					*cursor--
 				}
 			}
 
@@ -61,6 +81,9 @@ func init_buttons(buttons *Buttons, input_box *rl.Texture2D, should_close_connec
 				*should_close_connection = false
 				connect(ip, should_close_connection, player_textures, arrow, go_back, buttons)
 			}
+
+			*cursor_timer += rl.GetFrameTime()
+			*cursor_timer -= float32(int(*cursor_timer))
 		}
 	})
 	buttons.b_types[0].NewButton("credits", int32(rl.GetScreenWidth()/2)-300, 300, "CREDITS", 60, func(button *Button) {
@@ -102,6 +125,8 @@ func init_buttons(buttons *Buttons, input_box *rl.Texture2D, should_close_connec
 
 	buttons.b_types[2].NewButton("clear-input-box", int32(rl.GetScreenWidth()/2)+550, 100, "", 60, func(button *Button) {
 		*ip = ""
+		*cursor_timer = 0
+		*cursor = 0
 	})
 
 	buttons.b_types[3].NewButton("github", int32(rl.GetScreenWidth()/2)-300, 400, "GITHUB", 60, func(button *Button) {
@@ -138,15 +163,14 @@ func connect(ip *string, should_close_connection *bool, player_textures *[][3]rl
 			iterations := 0
 			for i := 0; i < len(err.Error()); {
 				last_space := i
-				j := i
-				for err.Error()[j] != '\n' && rl.MeasureText(err.Error()[i:j+1], 60) < int32(rl.GetScreenWidth())-200 {
+
+				for j := i; err.Error()[j] != '\n' && rl.MeasureText(err.Error()[i:j+1], 60) < int32(rl.GetScreenWidth())-200; j++ {
+					if j+1 == len(err.Error()) {
+						last_space = j + 1
+						break
+					}
 					if err.Error()[j] == ' ' {
 						last_space = j
-					}
-					j++
-					if j == len(err.Error()) {
-						last_space = j
-						break
 					}
 				}
 
