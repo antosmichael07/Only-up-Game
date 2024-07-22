@@ -111,6 +111,7 @@ func (b *Buttons) Draw(button_type int) {
 			if (len(b.b_types[button_type].buttons[i].id) < 7 || b.b_types[button_type].buttons[i].id[len(b.b_types[button_type].buttons[i].id)-7:] != "_select") && rl.CheckCollisionPointRec(rl.GetMousePosition(), rl.NewRectangle(float32(b.b_types[button_type].buttons[i].position[0]), float32(b.b_types[button_type].buttons[i].position[1]), float32(b.b_types[button_type].normal.Width), float32(b.b_types[button_type].normal.Height))) {
 				b.b_types[button_type].buttons[i].function(&b.b_types[button_type].buttons[i])
 				b.pressed_button = true
+				break
 			}
 		}
 	}
