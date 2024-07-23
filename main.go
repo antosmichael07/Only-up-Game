@@ -27,9 +27,9 @@ func main() {
 	stop_trying_to_connect := false
 	back_from_credits := false
 	go_back := false
+	ip := ""
 	cursor := 0
 	cursor_timer := float32(0)
-	ip := ""
 
 	player_textures := [][3]rl.Texture2D{
 		{
