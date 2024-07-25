@@ -22,6 +22,7 @@ func main() {
 	buttons.NewButtonType(&clear_normal, &clear_focused, &clear_pressed)
 	buttons.NewButtonType(&button_normal, &button_focused, &button_pressed)
 	buttons.NewButtonType(&button_normal, &button_focused, &button_pressed)
+	buttons.NewButtonType(&button_normal, &button_focused, &button_pressed)
 
 	should_close_connection := false
 	stop_trying_to_connect := false
@@ -30,6 +31,7 @@ func main() {
 	ip := ""
 	cursor := 0
 	cursor_timer := float32(0)
+	is_game_menu_open := false
 
 	player_textures := [][3]rl.Texture2D{
 		{
@@ -61,7 +63,7 @@ func main() {
 
 	arrow := rl.LoadTexture("resources/textures/arrow.png")
 
-	init_buttons(&buttons, &input_box, &should_close_connection, &stop_trying_to_connect, &ip, &back_from_credits, &player_textures, &arrow, &go_back, &cursor, &cursor_timer)
+	init_buttons(&buttons, &input_box, &should_close_connection, &stop_trying_to_connect, &ip, &back_from_credits, &player_textures, &arrow, &go_back, &cursor, &cursor_timer, &is_game_menu_open)
 
 	main_menu(&buttons)
 }

@@ -26,10 +26,11 @@ func init_game() ([]Player, []rl.Rectangle, []SideLauncher, []Launcher, rl.Camer
 	return players, collision_rects, side_launchers, launchers, camera
 }
 
-func game_loop(should_close_connection *bool, client *tcp.Client, player_textures *[][3]rl.Texture2D, arrow *rl.Texture2D) {
+func game_loop(should_close_connection *bool, client *tcp.Client, player_textures *[][3]rl.Texture2D, arrow *rl.Texture2D, buttons *Buttons, is_game_menu_open *bool) {
 	players, collision_rects, jumpers, side_launchers, camera := init_game()
 	player_num := byte(255)
 	remove_player := byte(255)
+	just_closed_game_menu := false
 
 	var wg_disconnect sync.WaitGroup
 	wg_disconnect.Add(2)
@@ -49,11 +50,9 @@ func game_loop(should_close_connection *bool, client *tcp.Client, player_texture
 		rl.BeginMode2D(camera)
 		update_camera(&players, &camera, &player_num)
 
-		players[player_num].Input()
 		for i := 0; i < len(players); i++ {
 			players[i].Update(&collision_rects, &jumpers, &side_launchers, player_textures, &players)
 		}
-		players[player_num].Kick(&players, &player_num, client)
 		players[player_num].DrawArrow(arrow)
 
 		for i := 0; i < len(collision_rects); i++ {
@@ -67,6 +66,23 @@ func game_loop(should_close_connection *bool, client *tcp.Client, player_texture
 		}
 
 		rl.EndMode2D()
+		if *is_game_menu_open {
+			rl.DrawRectangle(0, 0, int32(rl.GetScreenWidth()), int32(rl.GetScreenHeight()), rl.Fade(rl.Black, 0.6))
+			buttons.Draw(5)
+			if rl.IsKeyPressed(rl.KeyEscape) {
+				*is_game_menu_open = false
+				just_closed_game_menu = true
+			}
+		} else {
+			players[player_num].Input()
+			players[player_num].Kick(&players, &player_num, client)
+		}
+
+		if rl.IsKeyPressed(rl.KeyEscape) && !just_closed_game_menu {
+			*is_game_menu_open = true
+		}
+		just_closed_game_menu = false
+
 		rl.EndDrawing()
 
 		if remove_player != 255 {
@@ -75,10 +91,6 @@ func game_loop(should_close_connection *bool, client *tcp.Client, player_texture
 				player_num--
 			}
 			remove_player = 255
-		}
-
-		if rl.IsKeyPressed(rl.KeyEscape) {
-			*should_close_connection = true
 		}
 	}
 	wg_disconnect.Done()
