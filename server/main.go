@@ -1,6 +1,9 @@
 package main
 
 import (
+	"fmt"
+	"os"
+
 	lgr "github.com/antosmichael07/Go-Logger"
 	tcp "github.com/antosmichael07/Go-TCP-Connection"
 )
@@ -15,7 +18,7 @@ const (
 )
 
 func main() {
-	server := tcp.NewServer(":24680")
+	server := tcp.NewServer(fmt.Sprintf(":%s", os.Args[1]))
 	server.Logger.Level = lgr.None
 	players := map[[64]byte]byte{}
 

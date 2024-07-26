@@ -32,6 +32,7 @@ func main() {
 	cursor := 0
 	cursor_timer := float32(0)
 	is_game_menu_open := false
+	err := error(nil)
 
 	player_textures := [][3]rl.Texture2D{
 		{
@@ -63,7 +64,7 @@ func main() {
 
 	arrow := rl.LoadTexture("resources/textures/arrow.png")
 
-	init_buttons(&buttons, &input_box, &should_close_connection, &stop_trying_to_connect, &ip, &back_from_credits, &player_textures, &arrow, &go_back, &cursor, &cursor_timer, &is_game_menu_open)
+	init_buttons(&buttons, &input_box, &should_close_connection, &stop_trying_to_connect, &ip, &back_from_credits, &player_textures, &arrow, &go_back, &cursor, &cursor_timer, &is_game_menu_open, &err)
 
 	main_menu(&buttons)
 }

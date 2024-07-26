@@ -22,7 +22,7 @@ func main_menu(buttons *Buttons) {
 	}
 }
 
-func init_buttons(buttons *Buttons, input_box *rl.Texture2D, should_close_connection *bool, stop_trying_to_connect *bool, ip *string, back_from_credits *bool, player_textures *[][3]rl.Texture2D, arrow *rl.Texture2D, go_back *bool, cursor *int, cursor_timer *float32, is_game_menu_open *bool) {
+func init_buttons(buttons *Buttons, input_box *rl.Texture2D, should_close_connection *bool, stop_trying_to_connect *bool, ip *string, back_from_credits *bool, player_textures *[][3]rl.Texture2D, arrow *rl.Texture2D, go_back *bool, cursor *int, cursor_timer *float32, is_game_menu_open *bool, err *error) {
 	buttons.b_types[0].NewButton("join", int32(rl.GetScreenWidth()/2)-300, 100, "JOIN", 60, func(button *Button) {
 		*cursor_timer = 0.
 		*stop_trying_to_connect = false
@@ -79,7 +79,7 @@ func init_buttons(buttons *Buttons, input_box *rl.Texture2D, should_close_connec
 
 			if rl.IsKeyPressed(rl.KeyEnter) || rl.IsKeyPressed(rl.KeyKpEnter) {
 				*should_close_connection = false
-				connect(ip, should_close_connection, player_textures, arrow, go_back, buttons, is_game_menu_open)
+				connect(ip, should_close_connection, player_textures, arrow, go_back, buttons, is_game_menu_open, err)
 			}
 
 			*cursor_timer += rl.GetFrameTime()
@@ -116,7 +116,7 @@ func init_buttons(buttons *Buttons, input_box *rl.Texture2D, should_close_connec
 	buttons.b_types[1].NewButton("connect", int32(rl.GetScreenWidth()/2)-300, 400, "CONNECT", 60, func(button *Button) {
 		rl.EndDrawing()
 		*should_close_connection = false
-		connect(ip, should_close_connection, player_textures, arrow, go_back, buttons, is_game_menu_open)
+		connect(ip, should_close_connection, player_textures, arrow, go_back, buttons, is_game_menu_open, err)
 		rl.BeginDrawing()
 	})
 	buttons.b_types[1].NewButton("back-from-connecting", int32(rl.GetScreenWidth()/2)-300, 600, "BACK", 60, func(button *Button) {
@@ -141,6 +141,10 @@ func init_buttons(buttons *Buttons, input_box *rl.Texture2D, should_close_connec
 		*go_back = true
 	})
 
+	buttons.b_types[4].NewButton("copy-error", int32(rl.GetScreenWidth()/2)-300, 550, "COPY ERROR", 60, func(button *Button) {
+		rl.SetClipboardText((*err).Error())
+	})
+
 	buttons.b_types[5].NewButton("back-from-game-menu", int32(rl.GetScreenWidth()/2)-300, 100, "BACK TO GAME", 60, func(button *Button) {
 		*is_game_menu_open = false
 	})
@@ -151,7 +155,7 @@ func init_buttons(buttons *Buttons, input_box *rl.Texture2D, should_close_connec
 	})
 }
 
-func connect(ip *string, should_close_connection *bool, player_textures *[][3]rl.Texture2D, arrow *rl.Texture2D, go_back *bool, buttons *Buttons, is_game_menu_open *bool) {
+func connect(ip *string, should_close_connection *bool, player_textures *[][3]rl.Texture2D, arrow *rl.Texture2D, go_back *bool, buttons *Buttons, is_game_menu_open *bool, err *error) {
 	client := tcp.NewClient(*ip)
 	client.Logger.Level = lgr.None
 
@@ -160,8 +164,8 @@ func connect(ip *string, should_close_connection *bool, player_textures *[][3]rl
 	rl.DrawText("LOADING...", int32(rl.GetScreenWidth()/2)-rl.MeasureText("LOADING...", 60)/2, 300, 60, rl.Black)
 	rl.EndDrawing()
 
-	err := client.Connect()
-	if err != nil {
+	*err = client.Connect()
+	if *err != nil {
 		*go_back = false
 
 		for !*go_back {
@@ -170,20 +174,20 @@ func connect(ip *string, should_close_connection *bool, player_textures *[][3]rl
 			rl.ClearBackground(rl.SkyBlue)
 
 			iterations := 0
-			for i := 0; i < len(err.Error()); {
+			for i := 0; i < len((*err).Error()); {
 				last_space := i
 
-				for j := i; err.Error()[j] != '\n' && rl.MeasureText(err.Error()[i:j+1], 60) < int32(rl.GetScreenWidth())-200; j++ {
-					if j+1 == len(err.Error()) {
+				for j := i; (*err).Error()[j] != '\n' && rl.MeasureText((*err).Error()[i:j+1], 60) < int32(rl.GetScreenWidth())-200; j++ {
+					if j+1 == len((*err).Error()) {
 						last_space = j + 1
 						break
 					}
-					if err.Error()[j] == ' ' {
+					if (*err).Error()[j] == ' ' {
 						last_space = j
 					}
 				}
 
-				rl.DrawText(err.Error()[i:last_space], int32(rl.GetScreenWidth())/2-rl.MeasureText(err.Error()[i:last_space], 60)/2, 100+int32(70*iterations), 60, rl.Black)
+				rl.DrawText((*err).Error()[i:last_space], int32(rl.GetScreenWidth())/2-rl.MeasureText((*err).Error()[i:last_space], 60)/2, 100+int32(70*iterations), 60, rl.Black)
 
 				i = last_space + 1
 				iterations++
