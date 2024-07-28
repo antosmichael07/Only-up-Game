@@ -15,6 +15,7 @@ const (
 	event_player_leave
 	event_player_kick
 	event_i_wanna_leave
+	event_side_launcher_launched
 )
 
 func main() {
@@ -37,6 +38,10 @@ func main() {
 				break
 			}
 		}
+	})
+
+	server.On(event_side_launcher_launched, func(data *[]byte, conn *tcp.Connection) {
+		server.SendDataToAll(event_side_launcher_launched, data)
 	})
 
 	server.OnConnect(func(conn *tcp.Connection) {

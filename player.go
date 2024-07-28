@@ -46,12 +46,12 @@ func NewPlayer() Player {
 	return player
 }
 
-func (player *Player) Update(collision_rects *[]rl.Rectangle, side_launchers *[]SideLauncher, launchers *[]Launcher, player_textures *[][3]rl.Texture2D, players *[]Player) {
+func (player *Player) Update(collision_rects *[]rl.Rectangle, side_launchers *[]SideLauncher, launchers *[]Launcher, player_textures *[][3]rl.Texture2D, players *[]Player, client *tcp.Client) {
 	player.FrameTime = rl.GetFrameTime() * 60
 
 	player.Movement(collision_rects)
 	player.Fall(collision_rects)
-	player.SideLauncher(side_launchers, collision_rects)
+	player.SideLauncher(side_launchers, collision_rects, client)
 	player.Launcher(launchers)
 	player.Drawing(player_textures)
 }
@@ -172,13 +172,14 @@ func (player *Player) OnGround(collision_rects *[]rl.Rectangle) bool {
 	return false
 }
 
-func (player *Player) SideLauncher(side_launchers *[]SideLauncher, collision_rects *[]rl.Rectangle) {
+func (player *Player) SideLauncher(side_launchers *[]SideLauncher, collision_rects *[]rl.Rectangle, client *tcp.Client) {
 	player_rect := rl.NewRectangle(player.Position.X, player.Position.Y, player.Scale.X, player.Scale.Y)
 
 	for i := 0; i < len(*side_launchers); i++ {
 		if rl.CheckCollisionRecs(player_rect, (*side_launchers)[i].Rect) && (*side_launchers)[i].AnimationTimer <= 0 {
 			player.SideLauncherPower = (*side_launchers)[i].Power
 			(*side_launchers)[i].AnimationTimer = 2
+			client.SendData(event_side_launcher_launched, &[]byte{byte(i)})
 			break
 		}
 	}

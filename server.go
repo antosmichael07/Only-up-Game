@@ -29,6 +29,10 @@ func run_server(wg *sync.WaitGroup, wait_for_server *bool, err *error) {
 		}
 	})
 
+	server.On(event_side_launcher_launched, func(data *[]byte, conn *tcp.Connection) {
+		server.SendDataToAll(event_side_launcher_launched, data)
+	})
+
 	server.OnConnect(func(conn *tcp.Connection) {
 		players[conn.Token] = byte(len(server.Connections) - 1)
 		server.SendData(conn, event_player_num, &[]byte{byte(len(players) - 1)})

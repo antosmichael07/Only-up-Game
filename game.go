@@ -42,7 +42,7 @@ func game_loop(should_close_connection *bool, client *tcp.Client, player_texture
 
 	var wg sync.WaitGroup
 	wg.Add(1)
-	go connection(&players, &wg, &player_num, &remove_player, should_close_connection, &wg_disconnect, client, &wait_player_num_wg)
+	go connection(&players, &wg, &player_num, &remove_player, should_close_connection, &wg_disconnect, client, &wait_player_num_wg, &side_launchers)
 	go func() {
 		time.Sleep(5 * time.Second)
 		if player_num == 255 {
@@ -61,7 +61,7 @@ func game_loop(should_close_connection *bool, client *tcp.Client, player_texture
 		update_camera(&players, &camera, &player_num)
 
 		for i := 0; i < len(players); i++ {
-			players[i].Update(&collision_rects, &side_launchers, &launchers, player_textures, &players)
+			players[i].Update(&collision_rects, &side_launchers, &launchers, player_textures, &players, client)
 		}
 		players[player_num].DrawArrow(arrow)
 
