@@ -189,9 +189,9 @@ func (player *Player) SideLauncher(side_launchers *[]SideLauncher) {
 
 	if player.SideLauncherPower > 0 {
 		if player.Keys[0] == 1 {
-			player.SideLauncherPower -= player.SideLauncherResist * 2
+			player.SideLauncherPower -= player.SideLauncherResist * 5 * player.FrameTime
 		} else if player.Keys[1] == 1 {
-			player.SideLauncherPower -= player.SideLauncherResist / 2
+			player.SideLauncherPower -= player.SideLauncherResist / 5 * player.FrameTime
 			if player.SideLauncherPower < player.Speed {
 				player.SideLauncherPower = 0
 			}
@@ -204,12 +204,12 @@ func (player *Player) SideLauncher(side_launchers *[]SideLauncher) {
 		}
 	} else if player.SideLauncherPower < 0 {
 		if player.Keys[0] == 1 {
-			player.SideLauncherPower += player.SideLauncherResist / 2
+			player.SideLauncherPower += player.SideLauncherResist / 5 * player.FrameTime
 			if player.SideLauncherPower > -player.Speed {
 				player.SideLauncherPower = 0
 			}
 		} else if player.Keys[1] == 1 {
-			player.SideLauncherPower += player.SideLauncherResist * 2
+			player.SideLauncherPower += player.SideLauncherResist * 5 * player.FrameTime
 		} else {
 			player.SideLauncherPower += player.SideLauncherResist
 		}
