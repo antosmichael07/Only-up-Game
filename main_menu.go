@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"sync"
 
 	lgr "github.com/antosmichael07/Go-Logger"
 	tcp "github.com/antosmichael07/Go-TCP-Connection"
@@ -88,7 +89,33 @@ func init_buttons(buttons *Buttons, input_box *rl.Texture2D, should_close_connec
 		}
 	})
 
-	buttons.b_types[0].NewButton("open-settings", int32(rl.GetScreenWidth()/2)-300, 300, "SETTINGS", 60, func(button *Button) {
+	buttons.b_types[0].NewButton("host", int32(rl.GetScreenWidth()/2)-300, 300, "HOST", 60, func(button *Button) {
+		rl.EndDrawing()
+
+		var wg_server sync.WaitGroup
+		wg_server.Add(1)
+		wait_for_server := true
+		go run_server(&wg_server, &wait_for_server)
+
+		for wait_for_server {
+			window_manager()
+			rl.BeginDrawing()
+			rl.ClearBackground(rl.SkyBlue)
+
+			rl.DrawText("WAITING FOR SERVER TO START...", int32(rl.GetScreenWidth()/2)-rl.MeasureText("WAITING FOR SERVER TO START...", 60)/2, 300, 60, rl.Black)
+
+			rl.EndDrawing()
+		}
+
+		*ip = "localhost:24680"
+		*should_close_connection = false
+		connect(ip, should_close_connection, player_textures, arrow, go_back, buttons, is_game_menu_open, err, side_launcher_textures, settings)
+		wg_server.Done()
+
+		rl.BeginDrawing()
+	})
+
+	buttons.b_types[0].NewButton("open-settings", int32(rl.GetScreenWidth()/2)-300, 500, "SETTINGS", 60, func(button *Button) {
 		*is_settings_open = true
 
 		rl.EndDrawing()
@@ -309,7 +336,7 @@ func connect(ip *string, should_close_connection *bool, player_textures *[][3]rl
 
 	rl.BeginDrawing()
 	rl.ClearBackground(rl.SkyBlue)
-	rl.DrawText("LOADING...", int32(rl.GetScreenWidth()/2)-rl.MeasureText("LOADING...", 60)/2, 300, 60, rl.Black)
+	rl.DrawText("CONNECTING...", int32(rl.GetScreenWidth()/2)-rl.MeasureText("CONNECTING...", 60)/2, 300, 60, rl.Black)
 	rl.EndDrawing()
 
 	*err = client.Connect()
