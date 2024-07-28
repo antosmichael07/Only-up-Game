@@ -39,7 +39,6 @@ func main() {
 	cursor_timer := float32(0)
 	is_game_menu_open := false
 	is_settings_open := false
-	just_closed_settings := false
 	err := error(nil)
 	settings := Settings{
 		PlayerLeft:  rl.KeyA,
@@ -93,7 +92,7 @@ func main() {
 
 	arrow := rl.LoadTexture("resources/textures/arrow.png")
 
-	init_buttons(&buttons, &input_box, &should_close_connection, &stop_trying_to_connect, &ip, &back_from_credits, &player_textures, &arrow, &go_back, &cursor, &cursor_timer, &is_game_menu_open, &err, &side_launcher_textures, &settings, &is_settings_open, &just_closed_settings)
+	init_buttons(&buttons, &input_box, &should_close_connection, &stop_trying_to_connect, &ip, &back_from_credits, &player_textures, &arrow, &go_back, &cursor, &cursor_timer, &is_game_menu_open, &err, &side_launcher_textures, &settings, &is_settings_open)
 
 	main_menu(&buttons)
 }
