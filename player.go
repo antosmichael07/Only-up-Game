@@ -24,11 +24,6 @@ type Player struct {
 	Kicking            bool
 }
 
-type SideLauncher struct {
-	Rect  rl.Rectangle
-	Power float32
-}
-
 type Launcher struct {
 	Rect  rl.Rectangle
 	Power float32
@@ -183,6 +178,7 @@ func (player *Player) SideLauncher(side_launchers *[]SideLauncher) {
 	for i := 0; i < len(*side_launchers); i++ {
 		if rl.CheckCollisionRecs(player_rect, (*side_launchers)[i].Rect) {
 			player.SideLauncherPower = (*side_launchers)[i].Power
+			(*side_launchers)[i].AnimationTimer = 2
 			break
 		}
 	}

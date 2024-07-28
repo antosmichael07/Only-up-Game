@@ -62,9 +62,24 @@ func main() {
 		},
 	}
 
+	side_launcher_textures := [2][4]rl.Texture2D{
+		{
+			rl.LoadTexture("resources/textures/side_launcher_00.png"),
+			rl.LoadTexture("resources/textures/side_launcher_01.png"),
+			rl.LoadTexture("resources/textures/side_launcher_02.png"),
+			rl.LoadTexture("resources/textures/side_launcher_03.png"),
+		},
+		{
+			rl.LoadTexture("resources/textures/side_launcher_10.png"),
+			rl.LoadTexture("resources/textures/side_launcher_11.png"),
+			rl.LoadTexture("resources/textures/side_launcher_12.png"),
+			rl.LoadTexture("resources/textures/side_launcher_13.png"),
+		},
+	}
+
 	arrow := rl.LoadTexture("resources/textures/arrow.png")
 
-	init_buttons(&buttons, &input_box, &should_close_connection, &stop_trying_to_connect, &ip, &back_from_credits, &player_textures, &arrow, &go_back, &cursor, &cursor_timer, &is_game_menu_open, &err)
+	init_buttons(&buttons, &input_box, &should_close_connection, &stop_trying_to_connect, &ip, &back_from_credits, &player_textures, &arrow, &go_back, &cursor, &cursor_timer, &is_game_menu_open, &err, &side_launcher_textures)
 
 	main_menu(&buttons)
 }

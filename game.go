@@ -11,12 +11,12 @@ func init_game() ([]Player, []rl.Rectangle, []SideLauncher, []Launcher, rl.Camer
 	players := []Player{}
 
 	collision_rects := []rl.Rectangle{
-		rl.NewRectangle(25, 125, 250, 25),
+		rl.NewRectangle(25, 160, 250, 25),
 	}
 
 	side_launchers := []SideLauncher{
-		{rl.NewRectangle(25, 100, 25, 25), 8},
-		{rl.NewRectangle(250, 100, 25, 25), -8},
+		{rl.NewRectangle(25, 100, 40, 60), 7, 0},
+		{rl.NewRectangle(235, 100, 40, 60), -7, 0},
 	}
 
 	launchers := []Launcher{}
@@ -26,8 +26,8 @@ func init_game() ([]Player, []rl.Rectangle, []SideLauncher, []Launcher, rl.Camer
 	return players, collision_rects, side_launchers, launchers, camera
 }
 
-func game_loop(should_close_connection *bool, client *tcp.Client, player_textures *[][3]rl.Texture2D, arrow *rl.Texture2D, buttons *Buttons, is_game_menu_open *bool) {
-	players, collision_rects, jumpers, side_launchers, camera := init_game()
+func game_loop(should_close_connection *bool, client *tcp.Client, player_textures *[][3]rl.Texture2D, arrow *rl.Texture2D, buttons *Buttons, is_game_menu_open *bool, side_launcher_textures *[2][4]rl.Texture2D) {
+	players, collision_rects, side_launchers, launchers, camera := init_game()
 	player_num := byte(255)
 	remove_player := byte(255)
 	just_closed_game_menu := false
@@ -51,18 +51,18 @@ func game_loop(should_close_connection *bool, client *tcp.Client, player_texture
 		update_camera(&players, &camera, &player_num)
 
 		for i := 0; i < len(players); i++ {
-			players[i].Update(&collision_rects, &jumpers, &side_launchers, player_textures, &players)
+			players[i].Update(&collision_rects, &side_launchers, &launchers, player_textures, &players)
 		}
 		players[player_num].DrawArrow(arrow)
 
 		for i := 0; i < len(collision_rects); i++ {
 			rl.DrawRectangleRec(collision_rects[i], rl.Black)
 		}
-		for i := 0; i < len(jumpers); i++ {
-			rl.DrawRectangleRec(jumpers[i].Rect, rl.Red)
-		}
 		for i := 0; i < len(side_launchers); i++ {
-			rl.DrawRectangleRec(side_launchers[i].Rect, rl.Green)
+			side_launchers[i].Update(side_launcher_textures)
+		}
+		for i := 0; i < len(launchers); i++ {
+			rl.DrawRectangleRec(launchers[i].Rect, rl.Green)
 		}
 
 		rl.EndMode2D()
