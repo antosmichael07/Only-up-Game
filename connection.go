@@ -73,6 +73,14 @@ func connection(players *[]Player, wg *sync.WaitGroup, player_num *byte, remove_
 
 	for *player_num == 255 {
 		time.Sleep(200 * time.Millisecond)
+
+		if *should_close_connection {
+			client.SendData(event_i_wanna_leave, &[]byte{})
+
+			client.Disconnect()
+			wg_disconnect.Done()
+			return
+		}
 	}
 
 	data_sending(client, players, player_num, should_close_connection, wg_disconnect)

@@ -205,5 +205,45 @@ func connect(ip *string, should_close_connection *bool, player_textures *[][3]rl
 		return
 	}
 
-	game_loop(should_close_connection, &client, player_textures, arrow, buttons, is_game_menu_open, side_launcher_textures)
+	game_loop(should_close_connection, &client, player_textures, arrow, buttons, is_game_menu_open, side_launcher_textures, err)
+
+	if *err != nil {
+		*go_back = false
+
+		for !*go_back {
+			window_manager()
+			rl.BeginDrawing()
+			rl.ClearBackground(rl.SkyBlue)
+
+			iterations := 0
+			for i := 0; i < len((*err).Error()); {
+				last_space := i
+
+				for j := i; (*err).Error()[j] != '\n' && rl.MeasureText((*err).Error()[i:j+1], 60) < int32(rl.GetScreenWidth())-200; j++ {
+					if j+1 == len((*err).Error()) {
+						last_space = j + 1
+						break
+					}
+					if (*err).Error()[j] == ' ' {
+						last_space = j
+					}
+				}
+
+				rl.DrawText((*err).Error()[i:last_space], int32(rl.GetScreenWidth())/2-rl.MeasureText((*err).Error()[i:last_space], 60)/2, 100+int32(70*iterations), 60, rl.Black)
+
+				i = last_space + 1
+				iterations++
+			}
+
+			buttons.Draw(4)
+
+			rl.EndDrawing()
+
+			if rl.IsKeyPressed(rl.KeyEscape) {
+				*go_back = true
+			}
+		}
+
+		return
+	}
 }

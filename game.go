@@ -1,7 +1,9 @@
 package main
 
 import (
+	"errors"
 	"sync"
+	"time"
 
 	tcp "github.com/antosmichael07/Go-TCP-Connection"
 	rl "github.com/gen2brain/raylib-go/raylib"
@@ -26,7 +28,7 @@ func init_game() ([]Player, []rl.Rectangle, []SideLauncher, []Launcher, rl.Camer
 	return players, collision_rects, side_launchers, launchers, camera
 }
 
-func game_loop(should_close_connection *bool, client *tcp.Client, player_textures *[][3]rl.Texture2D, arrow *rl.Texture2D, buttons *Buttons, is_game_menu_open *bool, side_launcher_textures *[2][4]rl.Texture2D) {
+func game_loop(should_close_connection *bool, client *tcp.Client, player_textures *[][3]rl.Texture2D, arrow *rl.Texture2D, buttons *Buttons, is_game_menu_open *bool, side_launcher_textures *[2][4]rl.Texture2D, err *error) {
 	players, collision_rects, side_launchers, launchers, camera := init_game()
 	player_num := byte(255)
 	remove_player := byte(255)
@@ -41,6 +43,14 @@ func game_loop(should_close_connection *bool, client *tcp.Client, player_texture
 	var wg sync.WaitGroup
 	wg.Add(1)
 	go connection(&players, &wg, &player_num, &remove_player, should_close_connection, &wg_disconnect, client, &wait_player_num_wg)
+	go func() {
+		time.Sleep(5 * time.Second)
+		if player_num == 255 {
+			*err = errors.New("starter data wasn't received correctly, please try again")
+			*should_close_connection = true
+			wg.Done()
+		}
+	}()
 	wg.Wait()
 
 	for !*should_close_connection {
@@ -67,7 +77,7 @@ func game_loop(should_close_connection *bool, client *tcp.Client, player_texture
 
 		rl.EndMode2D()
 		if *is_game_menu_open {
-			rl.DrawRectangle(0, 0, int32(rl.GetScreenWidth()), int32(rl.GetScreenHeight()), rl.Fade(rl.Black, 0.6))
+			rl.DrawRectangle(0, 0, int32(rl.GetScreenWidth()), int32(rl.GetScreenHeight())+300, rl.Fade(rl.Black, 0.6))
 			buttons.Draw(5)
 			if rl.IsKeyPressed(rl.KeyEscape) {
 				*is_game_menu_open = false

@@ -2,7 +2,7 @@ module only-up
 
 go 1.22.2
 
-require github.com/antosmichael07/Go-TCP-Connection v1.52.9
+require github.com/antosmichael07/Go-TCP-Connection v1.52.10
 
 require (
 	github.com/antosmichael07/Go-Logger v1.17.0
