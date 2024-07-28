@@ -19,7 +19,7 @@ func init_game() ([]Player, []rl.Rectangle, []SideLauncher, []Launcher, rl.Camer
 	}
 
 	side_launchers := []SideLauncher{
-		NewSideLauncher(25, 90, 15, &collision_rects),
+		NewSideLauncher(25, 90, 6, &collision_rects),
 	}
 
 	launchers := []Launcher{}
