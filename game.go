@@ -33,7 +33,6 @@ func game_loop(should_close_connection *bool, client *tcp.Client, player_texture
 	players, collision_rects, side_launchers, launchers, camera := init_game()
 	player_num := byte(255)
 	remove_player := byte(255)
-	just_closed_game_menu := false
 
 	var wg_disconnect sync.WaitGroup
 	wg_disconnect.Add(2)
@@ -80,19 +79,14 @@ func game_loop(should_close_connection *bool, client *tcp.Client, player_texture
 		if *is_game_menu_open {
 			rl.DrawRectangle(0, 0, int32(rl.GetScreenWidth()), int32(rl.GetScreenHeight())+300, rl.Fade(rl.Black, 0.6))
 			buttons.Draw(5)
-			if rl.IsKeyPressed(rl.KeyEscape) && !just_closed_game_menu {
-				*is_game_menu_open = false
-				just_closed_game_menu = true
-			}
 		} else {
 			players[player_num].Input(settings)
 			players[player_num].Kick(&players, &player_num, client, settings)
 		}
 
 		if rl.IsKeyPressed(rl.KeyEscape) {
-			*is_game_menu_open = true
+			*is_game_menu_open = !*is_game_menu_open
 		}
-		just_closed_game_menu = false
 
 		rl.EndDrawing()
 
