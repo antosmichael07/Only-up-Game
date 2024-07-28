@@ -29,6 +29,7 @@ func main() {
 	buttons.NewButtonType(&controls_button_normal, &controls_button_focused, &controls_button_pressed)
 	buttons.NewButtonType(&button_normal, &button_focused, &button_pressed)
 	buttons.NewButtonType(&controls_button_normal, &controls_button_focused, &controls_button_pressed)
+	buttons.NewButtonType(&button_normal, &button_focused, &button_pressed)
 
 	should_close_connection := false
 	stop_trying_to_connect := false
@@ -39,6 +40,8 @@ func main() {
 	cursor_timer := float32(0)
 	is_game_menu_open := false
 	is_settings_open := false
+	wait_for_server := false
+	server_err := error(nil)
 	err := error(nil)
 	settings := Settings{
 		PlayerLeft:  rl.KeyA,
@@ -92,7 +95,7 @@ func main() {
 
 	arrow := rl.LoadTexture("resources/textures/arrow.png")
 
-	init_buttons(&buttons, &input_box, &should_close_connection, &stop_trying_to_connect, &ip, &back_from_credits, &player_textures, &arrow, &go_back, &cursor, &cursor_timer, &is_game_menu_open, &err, &side_launcher_textures, &settings, &is_settings_open)
+	init_buttons(&buttons, &input_box, &should_close_connection, &stop_trying_to_connect, &ip, &back_from_credits, &player_textures, &arrow, &go_back, &cursor, &cursor_timer, &is_game_menu_open, &err, &side_launcher_textures, &settings, &is_settings_open, &wait_for_server, &server_err)
 
 	main_menu(&buttons)
 }

@@ -24,7 +24,7 @@ func main_menu(buttons *Buttons) {
 	}
 }
 
-func init_buttons(buttons *Buttons, input_box *rl.Texture2D, should_close_connection *bool, stop_trying_to_connect *bool, ip *string, back_from_credits *bool, player_textures *[][3]rl.Texture2D, arrow *rl.Texture2D, go_back *bool, cursor *int, cursor_timer *float32, is_game_menu_open *bool, err *error, side_launcher_textures *[2][4]rl.Texture2D, settings *Settings, is_settings_open *bool) {
+func init_buttons(buttons *Buttons, input_box *rl.Texture2D, should_close_connection *bool, stop_trying_to_connect *bool, ip *string, back_from_credits *bool, player_textures *[][3]rl.Texture2D, arrow *rl.Texture2D, go_back *bool, cursor *int, cursor_timer *float32, is_game_menu_open *bool, err *error, side_launcher_textures *[2][4]rl.Texture2D, settings *Settings, is_settings_open *bool, wait_for_server *bool, server_err *error) {
 	buttons.b_types[0].NewButton("join", int32(rl.GetScreenWidth()/2)-300, 100, "JOIN", 60, func(button *Button) {
 		*cursor_timer = 0.
 		*stop_trying_to_connect = false
@@ -94,10 +94,10 @@ func init_buttons(buttons *Buttons, input_box *rl.Texture2D, should_close_connec
 
 		var wg_server sync.WaitGroup
 		wg_server.Add(1)
-		wait_for_server := true
-		go run_server(&wg_server, &wait_for_server)
+		*wait_for_server = true
+		go run_server(&wg_server, wait_for_server, server_err)
 
-		for wait_for_server {
+		for *wait_for_server {
 			window_manager()
 			rl.BeginDrawing()
 			rl.ClearBackground(rl.SkyBlue)
@@ -105,6 +105,44 @@ func init_buttons(buttons *Buttons, input_box *rl.Texture2D, should_close_connec
 			rl.DrawText("WAITING FOR SERVER TO START...", int32(rl.GetScreenWidth()/2)-rl.MeasureText("WAITING FOR SERVER TO START...", 60)/2, 300, 60, rl.Black)
 
 			rl.EndDrawing()
+
+			if *server_err != nil {
+				for *wait_for_server {
+					window_manager()
+					rl.BeginDrawing()
+					rl.ClearBackground(rl.SkyBlue)
+
+					iterations := 0
+					for i := 0; i < len((*server_err).Error()); {
+						last_space := i
+
+						for j := i; (*server_err).Error()[j] != '\n' && rl.MeasureText((*server_err).Error()[i:j+1], 60) < int32(rl.GetScreenWidth())-200; j++ {
+							if j+1 == len((*server_err).Error()) {
+								last_space = j + 1
+								break
+							}
+							if (*server_err).Error()[j] == ' ' {
+								last_space = j
+							}
+						}
+
+						rl.DrawText((*server_err).Error()[i:last_space], int32(rl.GetScreenWidth())/2-rl.MeasureText((*server_err).Error()[i:last_space], 60)/2, 100+int32(70*iterations), 60, rl.Black)
+
+						i = last_space + 1
+						iterations++
+					}
+
+					buttons.Draw(9)
+
+					rl.EndDrawing()
+
+					if rl.IsKeyPressed(rl.KeyEscape) {
+						*wait_for_server = false
+					}
+				}
+
+				return
+			}
 		}
 
 		*ip = "localhost:24680"
@@ -314,6 +352,14 @@ func init_buttons(buttons *Buttons, input_box *rl.Texture2D, should_close_connec
 		}
 
 		rl.BeginDrawing()
+	})
+
+	buttons.b_types[9].NewButton("copy-server-error", int32(rl.GetScreenWidth())/2-300, int32(rl.GetScreenHeight())-450, "COPY ERROR", 60, func(button *Button) {
+		rl.SetClipboardText((*server_err).Error())
+	})
+
+	buttons.b_types[9].NewButton("back-from-server-error", int32(rl.GetScreenWidth())/2-300, int32(rl.GetScreenHeight())-250, "BACK", 60, func(button *Button) {
+		*wait_for_server = false
 	})
 
 	if settings.PlayerLeft == rl.KeySpace {

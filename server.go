@@ -7,7 +7,7 @@ import (
 	tcp "github.com/antosmichael07/Go-TCP-Connection"
 )
 
-func run_server(wg *sync.WaitGroup, wait_for_server *bool) {
+func run_server(wg *sync.WaitGroup, wait_for_server *bool, err *error) {
 	server := tcp.NewServer(":24680")
 	server.Logger.Level = lgr.None
 	players := map[[64]byte]byte{}
@@ -55,5 +55,5 @@ func run_server(wg *sync.WaitGroup, wait_for_server *bool) {
 		*wait_for_server = false
 	})
 
-	server.Start()
+	*err = server.Start()
 }
