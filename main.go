@@ -28,6 +28,7 @@ func main() {
 	buttons.NewButtonType(&button_normal, &button_focused, &button_pressed)
 	buttons.NewButtonType(&controls_button_normal, &controls_button_focused, &controls_button_pressed)
 	buttons.NewButtonType(&button_normal, &button_focused, &button_pressed)
+	buttons.NewButtonType(&controls_button_normal, &controls_button_focused, &controls_button_pressed)
 
 	should_close_connection := false
 	stop_trying_to_connect := false
