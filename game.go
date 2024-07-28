@@ -14,11 +14,12 @@ func init_game() ([]Player, []rl.Rectangle, []SideLauncher, []Launcher, rl.Camer
 
 	collision_rects := []rl.Rectangle{
 		rl.NewRectangle(25, 160, 250, 25),
+		rl.NewRectangle(25, 150, 80, 10),
+		rl.NewRectangle(140, 150, 25, 10),
 	}
 
 	side_launchers := []SideLauncher{
-		{rl.NewRectangle(25, 100, 40, 60), 7, 0},
-		{rl.NewRectangle(235, 100, 40, 60), -7, 0},
+		NewSideLauncher(25, 90, 15, &collision_rects),
 	}
 
 	launchers := []Launcher{}
@@ -28,7 +29,7 @@ func init_game() ([]Player, []rl.Rectangle, []SideLauncher, []Launcher, rl.Camer
 	return players, collision_rects, side_launchers, launchers, camera
 }
 
-func game_loop(should_close_connection *bool, client *tcp.Client, player_textures *[][3]rl.Texture2D, arrow *rl.Texture2D, buttons *Buttons, is_game_menu_open *bool, side_launcher_textures *[2][4]rl.Texture2D, err *error) {
+func game_loop(should_close_connection *bool, client *tcp.Client, player_textures *[][3]rl.Texture2D, arrow *rl.Texture2D, buttons *Buttons, is_game_menu_open *bool, side_launcher_textures *[2][4]rl.Texture2D, err *error, settings *Settings, just_closed_settings *bool) {
 	players, collision_rects, side_launchers, launchers, camera := init_game()
 	player_num := byte(255)
 	remove_player := byte(255)
@@ -79,16 +80,17 @@ func game_loop(should_close_connection *bool, client *tcp.Client, player_texture
 		if *is_game_menu_open {
 			rl.DrawRectangle(0, 0, int32(rl.GetScreenWidth()), int32(rl.GetScreenHeight())+300, rl.Fade(rl.Black, 0.6))
 			buttons.Draw(5)
-			if rl.IsKeyPressed(rl.KeyEscape) {
+			if rl.IsKeyPressed(rl.KeyEscape) && !just_closed_game_menu && !*just_closed_settings {
 				*is_game_menu_open = false
 				just_closed_game_menu = true
 			}
+			*just_closed_settings = false
 		} else {
-			players[player_num].Input()
-			players[player_num].Kick(&players, &player_num, client)
+			players[player_num].Input(settings)
+			players[player_num].Kick(&players, &player_num, client, settings)
 		}
 
-		if rl.IsKeyPressed(rl.KeyEscape) && !just_closed_game_menu {
+		if rl.IsKeyPressed(rl.KeyEscape) {
 			*is_game_menu_open = true
 		}
 		just_closed_game_menu = false
@@ -109,5 +111,6 @@ func game_loop(should_close_connection *bool, client *tcp.Client, player_texture
 }
 
 func update_camera(players *[]Player, camera *rl.Camera2D, player_num *byte) {
+	camera.Target.X = rl.Lerp(camera.Target.X, (*players)[*player_num].Position.X+12.5, 0.05*(*players)[*player_num].FrameTime)
 	camera.Target.Y = rl.Lerp(camera.Target.Y, (*players)[*player_num].Position.Y, 0.05*(*players)[*player_num].FrameTime)
 }

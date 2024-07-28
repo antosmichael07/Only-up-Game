@@ -8,6 +8,16 @@ type SideLauncher struct {
 	AnimationTimer float32
 }
 
+func NewSideLauncher(x, y, power float32, collision_rects *[]rl.Rectangle) SideLauncher {
+	if power < 0 {
+		*collision_rects = append(*collision_rects, rl.NewRectangle(x+36, y+10, 14, 40))
+		return SideLauncher{rl.NewRectangle(x+10, y, 40, 60), power, 0}
+	} else {
+		*collision_rects = append(*collision_rects, rl.NewRectangle(x, y+10, 14, 40))
+		return SideLauncher{rl.NewRectangle(x, y, 40, 60), power, 0}
+	}
+}
+
 func (side_launcher *SideLauncher) Update(side_launcher_textures *[2][4]rl.Texture2D) {
 	if side_launcher.AnimationTimer > 0 {
 		side_launcher.AnimationTimer -= rl.GetFrameTime()

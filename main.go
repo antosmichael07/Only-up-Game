@@ -12,6 +12,9 @@ func main() {
 	button_normal := rl.LoadTexture("resources/textures/button_normal.png")
 	button_focused := rl.LoadTexture("resources/textures/button_focused.png")
 	button_pressed := rl.LoadTexture("resources/textures/button_pressed.png")
+	controls_button_normal := rl.LoadTexture("resources/textures/controls_button_normal.png")
+	controls_button_focused := rl.LoadTexture("resources/textures/controls_button_focused.png")
+	controls_button_pressed := rl.LoadTexture("resources/textures/controls_button_pressed.png")
 	clear_normal := rl.LoadTexture("resources/textures/clear_normal.png")
 	clear_focused := rl.LoadTexture("resources/textures/clear_focused.png")
 	clear_pressed := rl.LoadTexture("resources/textures/clear_pressed.png")
@@ -23,16 +26,26 @@ func main() {
 	buttons.NewButtonType(&button_normal, &button_focused, &button_pressed)
 	buttons.NewButtonType(&button_normal, &button_focused, &button_pressed)
 	buttons.NewButtonType(&button_normal, &button_focused, &button_pressed)
+	buttons.NewButtonType(&controls_button_normal, &controls_button_focused, &controls_button_pressed)
+	buttons.NewButtonType(&button_normal, &button_focused, &button_pressed)
 
 	should_close_connection := false
 	stop_trying_to_connect := false
 	back_from_credits := false
 	go_back := false
-	ip := ""
+	ip := "localhost:24680"
 	cursor := 0
 	cursor_timer := float32(0)
 	is_game_menu_open := false
+	is_settings_open := false
+	just_closed_settings := false
 	err := error(nil)
+	settings := Settings{
+		PlayerLeft:  rl.KeyA,
+		PlayerRight: rl.KeyD,
+		PlayerJump:  rl.KeyW,
+		PlayerKick:  rl.KeySpace,
+	}
 
 	player_textures := [][3]rl.Texture2D{
 		{
@@ -79,7 +92,7 @@ func main() {
 
 	arrow := rl.LoadTexture("resources/textures/arrow.png")
 
-	init_buttons(&buttons, &input_box, &should_close_connection, &stop_trying_to_connect, &ip, &back_from_credits, &player_textures, &arrow, &go_back, &cursor, &cursor_timer, &is_game_menu_open, &err, &side_launcher_textures)
+	init_buttons(&buttons, &input_box, &should_close_connection, &stop_trying_to_connect, &ip, &back_from_credits, &player_textures, &arrow, &go_back, &cursor, &cursor_timer, &is_game_menu_open, &err, &side_launcher_textures, &settings, &is_settings_open, &just_closed_settings)
 
 	main_menu(&buttons)
 }

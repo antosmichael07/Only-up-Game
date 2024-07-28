@@ -51,7 +51,7 @@ func (player *Player) Update(collision_rects *[]rl.Rectangle, side_launchers *[]
 
 	player.Movement(collision_rects)
 	player.Fall(collision_rects)
-	player.SideLauncher(side_launchers)
+	player.SideLauncher(side_launchers, collision_rects)
 	player.Launcher(launchers)
 	player.Drawing(player_textures)
 }
@@ -172,11 +172,11 @@ func (player *Player) OnGround(collision_rects *[]rl.Rectangle) bool {
 	return false
 }
 
-func (player *Player) SideLauncher(side_launchers *[]SideLauncher) {
+func (player *Player) SideLauncher(side_launchers *[]SideLauncher, collision_rects *[]rl.Rectangle) {
 	player_rect := rl.NewRectangle(player.Position.X, player.Position.Y, player.Scale.X, player.Scale.Y)
 
 	for i := 0; i < len(*side_launchers); i++ {
-		if rl.CheckCollisionRecs(player_rect, (*side_launchers)[i].Rect) {
+		if rl.CheckCollisionRecs(player_rect, (*side_launchers)[i].Rect) && (*side_launchers)[i].AnimationTimer <= 0 {
 			player.SideLauncherPower = (*side_launchers)[i].Power
 			(*side_launchers)[i].AnimationTimer = 2
 			break
@@ -215,6 +215,21 @@ func (player *Player) SideLauncher(side_launchers *[]SideLauncher) {
 		}
 	}
 
+	player_rect = rl.NewRectangle(player.Position.X+player.SideLauncherPower*player.FrameTime, player.Position.Y, player.Scale.X, player.Scale.Y)
+
+	for i := 0; i < len(*collision_rects); i++ {
+		if rl.CheckCollisionRecs(player_rect, (*collision_rects)[i]) {
+			if player.SideLauncherPower > 0 {
+				player.SideLauncherPower = player.SideLauncherPower * -1
+				player.Position.X = (*collision_rects)[i].X - player.Scale.X
+			} else {
+				player.SideLauncherPower = player.SideLauncherPower * -1
+				player.Position.X = (*collision_rects)[i].X + (*collision_rects)[i].Width
+			}
+			return
+		}
+	}
+
 	player.Position.X += player.SideLauncherPower * player.FrameTime
 }
 
@@ -229,8 +244,8 @@ func (player *Player) Launcher(launchers *[]Launcher) {
 	}
 }
 
-func (player *Player) Kick(players *[]Player, player_num *byte, client *tcp.Client) {
-	if rl.IsKeyPressed(rl.KeySpace) {
+func (player *Player) Kick(players *[]Player, player_num *byte, client *tcp.Client, settings *Settings) {
+	if rl.IsKeyPressed(settings.PlayerKick) {
 		player_rect := rl.NewRectangle(player.Position.X, player.Position.Y, player.Scale.X, player.Scale.Y)
 
 		for i := 0; i < len(*players); i++ {
