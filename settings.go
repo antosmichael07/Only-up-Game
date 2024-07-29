@@ -23,7 +23,7 @@ func create_settings_file() {
 		os.Mkdir(fmt.Sprintf("%s/AppData/Local/OnlyUpGame", u.HomeDir), 0755)
 	}
 	if _, err := os.Stat(fmt.Sprintf("%s/AppData/Local/OnlyUpGame/settings.conf", u.HomeDir)); os.IsNotExist(err) {
-		os.WriteFile(fmt.Sprintf("%s/AppData/Local/OnlyUpGame/settings.conf", u.HomeDir), default_settings(), 0644)
+		os.WriteFile(fmt.Sprintf("%s/AppData/Local/OnlyUpGame/settings.conf", u.HomeDir), default_settings_in_bytes(), 0644)
 	}
 }
 
@@ -34,13 +34,7 @@ func load_settings() Settings {
 
 	data, err := os.ReadFile(fmt.Sprintf("%s/AppData/Local/OnlyUpGame/settings.conf", u.HomeDir))
 	if err != nil {
-		return Settings{
-			Port:        24680,
-			PlayerLeft:  int32(rl.KeyA),
-			PlayerRight: int32(rl.KeyD),
-			PlayerJump:  int32(rl.KeyW),
-			PlayerKick:  int32(rl.KeySpace),
-		}
+		return default_settings()
 	}
 
 	return Settings{
@@ -67,7 +61,17 @@ func save_settings(settings *Settings) {
 	os.WriteFile(fmt.Sprintf("%s/AppData/Local/OnlyUpGame/settings.conf", u.HomeDir), data, 0644)
 }
 
-func default_settings() []byte {
+func default_settings() Settings {
+	return Settings{
+		Port:        24680,
+		PlayerLeft:  int32(rl.KeyA),
+		PlayerRight: int32(rl.KeyD),
+		PlayerJump:  int32(rl.KeyW),
+		PlayerKick:  int32(rl.KeySpace),
+	}
+}
+
+func default_settings_in_bytes() []byte {
 	return []byte{
 		96, 104,
 		0, 0, 0, rl.KeyA,
@@ -89,12 +93,14 @@ func set_control_setting(control *int32, str_control string, input_box *rl.Textu
 		key_pressed = rl.GetKeyPressed()
 	}
 
-	*control = key_pressed
-	save_settings(settings)
+	if key_pressed != rl.KeyEscape {
+		*control = key_pressed
+		save_settings(settings)
 
-	if key_pressed == rl.KeySpace {
-		buttons.b_types[6].SetText(fmt.Sprintf("set-player-%s-setting", str_control), "SPACE")
-	} else {
-		buttons.b_types[6].SetText(fmt.Sprintf("set-player-%s-setting", str_control), string(*control))
+		if key_pressed == rl.KeySpace {
+			buttons.b_types[6].SetText(fmt.Sprintf("set-player-%s-setting", str_control), "SPACE")
+		} else {
+			buttons.b_types[6].SetText(fmt.Sprintf("set-player-%s-setting", str_control), string(*control))
+		}
 	}
 }

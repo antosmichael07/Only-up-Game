@@ -12,9 +12,9 @@ func main() {
 	button_normal := rl.LoadTexture("resources/textures/button_normal.png")
 	button_focused := rl.LoadTexture("resources/textures/button_focused.png")
 	button_pressed := rl.LoadTexture("resources/textures/button_pressed.png")
-	controls_button_normal := rl.LoadTexture("resources/textures/controls_button_normal.png")
-	controls_button_focused := rl.LoadTexture("resources/textures/controls_button_focused.png")
-	controls_button_pressed := rl.LoadTexture("resources/textures/controls_button_pressed.png")
+	little_button_normal := rl.LoadTexture("resources/textures/little_button_normal.png")
+	little_button_focused := rl.LoadTexture("resources/textures/little_button_focused.png")
+	little_button_pressed := rl.LoadTexture("resources/textures/little_button_pressed.png")
 	clear_normal := rl.LoadTexture("resources/textures/clear_normal.png")
 	clear_focused := rl.LoadTexture("resources/textures/clear_focused.png")
 	clear_pressed := rl.LoadTexture("resources/textures/clear_pressed.png")
@@ -26,10 +26,11 @@ func main() {
 	buttons.NewButtonType(&button_normal, &button_focused, &button_pressed)
 	buttons.NewButtonType(&button_normal, &button_focused, &button_pressed)
 	buttons.NewButtonType(&button_normal, &button_focused, &button_pressed)
-	buttons.NewButtonType(&controls_button_normal, &controls_button_focused, &controls_button_pressed)
+	buttons.NewButtonType(&little_button_normal, &little_button_focused, &little_button_pressed)
 	buttons.NewButtonType(&button_normal, &button_focused, &button_pressed)
-	buttons.NewButtonType(&controls_button_normal, &controls_button_focused, &controls_button_pressed)
+	buttons.NewButtonType(&little_button_normal, &little_button_focused, &little_button_pressed)
 	buttons.NewButtonType(&button_normal, &button_focused, &button_pressed)
+	buttons.NewButtonType(&little_button_normal, &little_button_focused, &little_button_pressed)
 
 	should_close_connection := false
 	stop_trying_to_connect := false

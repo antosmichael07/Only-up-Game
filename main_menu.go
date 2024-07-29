@@ -169,6 +169,7 @@ func init_buttons(buttons *Buttons, input_box *rl.Texture2D, should_close_connec
 			rl.DrawText("KICK", int32(rl.GetScreenWidth()/2)-rl.MeasureText("KICK", 60)/2, 330, 60, rl.Black)
 			buttons.Draw(6)
 			buttons.Draw(7)
+			buttons.Draw(10)
 
 			rl.EndDrawing()
 
@@ -284,6 +285,15 @@ func init_buttons(buttons *Buttons, input_box *rl.Texture2D, should_close_connec
 
 	buttons.b_types[9].NewButton("back-from-server-error", int32(rl.GetScreenWidth())/2-300, int32(rl.GetScreenHeight())-250, "BACK", 60, func(button *Button) {
 		*wait_for_server = false
+	})
+
+	buttons.b_types[10].NewButton("set-default-settings", int32(rl.GetScreenWidth())-400, int32(rl.GetScreenHeight())-250, "DEFAULT", 50, func(button *Button) {
+		*settings = default_settings()
+		save_settings(settings)
+		buttons.b_types[6].SetText("set-player-left-setting", "A")
+		buttons.b_types[6].SetText("set-player-right-setting", "D")
+		buttons.b_types[6].SetText("set-player-jump-setting", "W")
+		buttons.b_types[6].SetText("set-player-kick-setting", "SPACE")
 	})
 
 	if settings.PlayerLeft == rl.KeySpace {
