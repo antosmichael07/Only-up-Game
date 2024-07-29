@@ -61,13 +61,18 @@ func main() {
 		}
 	})
 
-	go func() {
-		logger, lgr_err := lgr.NewLogger("SERVER", "logs", true)
-		if lgr_err != nil {
-			logger.Output.File = false
-			logger.Log(lgr.Error, "failed to open logger files, logging to console only")
-		}
+	logger, lgr_err := lgr.NewLogger("SERVER", "logs", true)
+	if lgr_err != nil {
+		logger.Output.File = false
+		logger.Log(lgr.Error, "failed to open logger files, logging to console only")
+	}
+	logger.Log(lgr.Info, "server is starting...")
 
+	server.OnStart(func() {
+		logger.Log(lgr.Info, "server started")
+	})
+
+	go func() {
 		skip := false
 		for {
 			str := ""
@@ -75,6 +80,10 @@ func main() {
 
 			if skip {
 				skip = false
+				continue
+			}
+
+			if str == "" {
 				continue
 			}
 
@@ -92,8 +101,6 @@ func main() {
 			}
 
 			switch str {
-			case "":
-				continue
 			case "stop":
 				logger.Log(lgr.Info, "stopping the server...")
 				server.Stop()
