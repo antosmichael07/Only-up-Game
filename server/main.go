@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"time"
 
 	lgr "github.com/antosmichael07/Go-Logger"
 	tcp "github.com/antosmichael07/Go-TCP-Connection"
@@ -61,17 +62,38 @@ func main() {
 	})
 
 	go func() {
-		logger, err := lgr.NewLogger("SERVER", "logs", true)
-		if err != nil {
+		logger, lgr_err := lgr.NewLogger("SERVER", "logs", true)
+		if lgr_err != nil {
 			logger.Output.File = false
 			logger.Log(lgr.Error, "failed to open logger files, logging to console only")
 		}
 
+		skip := false
 		for {
 			str := ""
 			fmt.Scanf("%s", &str)
 
+			if skip {
+				skip = false
+				continue
+			}
+
+			time_now := time.Now().String()[:19]
+			if logger.Output.File {
+				if logger.OpenedFile != time_now[:10] {
+					logger.File.Close()
+					if file, err := os.OpenFile(fmt.Sprintf("./%s/%s.txt", logger.Directory, time_now[:10]), os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644); err == nil {
+						logger.File = file
+						logger.OpenedFile = time_now[:10]
+					}
+				}
+
+				logger.File.WriteString(fmt.Sprintf("[%s] %s\n", time_now, str))
+			}
+
 			switch str {
+			case "":
+				continue
 			case "stop":
 				logger.Log(lgr.Info, "stopping the server...")
 				server.Stop()
@@ -80,6 +102,8 @@ func main() {
 			default:
 				logger.Log(lgr.Error, "unknown command")
 			}
+
+			skip = true
 		}
 	}()
 
