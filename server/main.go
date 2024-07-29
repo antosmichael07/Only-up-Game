@@ -60,6 +60,23 @@ func main() {
 		}
 	})
 
+	go func() {
+		for {
+			str := ""
+			fmt.Scanf("%s", &str)
+
+			switch str {
+			case "stop":
+				fmt.Println("stopping the server...")
+				server.Stop()
+				return
+
+			default:
+				fmt.Println("unknown command")
+			}
+		}
+	}()
+
 	err := server.Start()
 
 	if err != nil {
