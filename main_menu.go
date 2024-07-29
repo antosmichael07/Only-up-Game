@@ -145,7 +145,7 @@ func init_buttons(buttons *Buttons, input_box *rl.Texture2D, should_close_connec
 			}
 		}
 
-		*ip = "localhost:24680"
+		*ip = fmt.Sprintf("localhost:%d", settings.Port)
 		*should_close_connection = false
 		connect(ip, should_close_connection, player_textures, arrow, go_back, buttons, is_game_menu_open, err, side_launcher_textures, settings)
 		wg_server.Done()

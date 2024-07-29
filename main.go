@@ -36,7 +36,7 @@ func main() {
 	stop_trying_to_connect := false
 	back_from_credits := false
 	go_back := false
-	ip := "localhost:24680"
+	ip := ""
 	cursor := 0
 	cursor_timer := float32(0)
 	is_game_menu_open := false
