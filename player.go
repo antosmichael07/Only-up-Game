@@ -246,7 +246,7 @@ func (player *Player) Launcher(launchers *[]Launcher) {
 }
 
 func (player *Player) Kick(players *[]Player, player_num *byte, client *tcp.Client, settings *Settings) {
-	if rl.IsKeyPressed(settings.PlayerKick) {
+	if rl.IsKeyPressed(settings.PlayerKick) && !player.Kicking {
 		player_rect := rl.NewRectangle(player.Position.X, player.Position.Y, player.Scale.X, player.Scale.Y)
 
 		for i := 0; i < len(*players); i++ {

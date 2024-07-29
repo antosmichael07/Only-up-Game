@@ -95,7 +95,7 @@ func init_buttons(buttons *Buttons, input_box *rl.Texture2D, should_close_connec
 		var wg_server sync.WaitGroup
 		wg_server.Add(1)
 		*wait_for_server = true
-		go run_server(&wg_server, wait_for_server, server_err)
+		go run_server(&wg_server, wait_for_server, server_err, settings)
 
 		for *wait_for_server {
 			window_manager()
@@ -228,101 +228,25 @@ func init_buttons(buttons *Buttons, input_box *rl.Texture2D, should_close_connec
 
 	buttons.b_types[6].NewButton("set-player-left-setting", int32(rl.GetScreenWidth()/2)-475, 200, string(settings.PlayerLeft), 60, func(button *Button) {
 		rl.EndDrawing()
-
-		key_pressed := rl.GetKeyPressed()
-		for key_pressed == 0 {
-			window_manager()
-			rl.BeginDrawing()
-			rl.ClearBackground(rl.SkyBlue)
-			rl.DrawTexture(*input_box, int32(rl.GetScreenWidth()/2)-500, 300, rl.White)
-			rl.DrawText("PRESS A KEY", int32(rl.GetScreenWidth()/2)-rl.MeasureText("PRESS A KEY", 60)/2, 345, 60, rl.Black)
-			rl.EndDrawing()
-			key_pressed = rl.GetKeyPressed()
-		}
-
-		settings.PlayerLeft = key_pressed
-
-		if key_pressed == rl.KeySpace {
-			buttons.b_types[6].SetText("set-player-left-setting", "SPACE")
-		} else {
-			buttons.b_types[6].SetText("set-player-left-setting", string(settings.PlayerLeft))
-		}
-
+		set_control_setting(&settings.PlayerLeft, "left", input_box, buttons, settings)
 		rl.BeginDrawing()
 	})
 
 	buttons.b_types[6].NewButton("set-player-right-setting", int32(rl.GetScreenWidth()/2)+175, 200, string(settings.PlayerRight), 60, func(button *Button) {
 		rl.EndDrawing()
-
-		key_pressed := rl.GetKeyPressed()
-		for key_pressed == 0 {
-			window_manager()
-			rl.BeginDrawing()
-			rl.ClearBackground(rl.SkyBlue)
-			rl.DrawTexture(*input_box, int32(rl.GetScreenWidth()/2)-500, 300, rl.White)
-			rl.DrawText("PRESS A KEY", int32(rl.GetScreenWidth()/2)-rl.MeasureText("PRESS A KEY", 60)/2, 345, 60, rl.Black)
-			rl.EndDrawing()
-			key_pressed = rl.GetKeyPressed()
-		}
-
-		settings.PlayerRight = key_pressed
-
-		if key_pressed == rl.KeySpace {
-			buttons.b_types[6].SetText("set-player-right-setting", "SPACE")
-		} else {
-			buttons.b_types[6].SetText("set-player-right-setting", string(settings.PlayerRight))
-		}
-
+		set_control_setting(&settings.PlayerRight, "right", input_box, buttons, settings)
 		rl.BeginDrawing()
 	})
 
 	buttons.b_types[6].NewButton("set-player-jump-setting", int32(rl.GetScreenWidth()/2)-150, 125, string(settings.PlayerJump), 60, func(button *Button) {
 		rl.EndDrawing()
-
-		key_pressed := rl.GetKeyPressed()
-		for key_pressed == 0 {
-			window_manager()
-			rl.BeginDrawing()
-			rl.ClearBackground(rl.SkyBlue)
-			rl.DrawTexture(*input_box, int32(rl.GetScreenWidth()/2)-500, 300, rl.White)
-			rl.DrawText("PRESS A KEY", int32(rl.GetScreenWidth()/2)-rl.MeasureText("PRESS A KEY", 60)/2, 345, 60, rl.Black)
-			rl.EndDrawing()
-			key_pressed = rl.GetKeyPressed()
-		}
-
-		settings.PlayerJump = key_pressed
-
-		if key_pressed == rl.KeySpace {
-			buttons.b_types[6].SetText("set-player-jump-setting", "SPACE")
-		} else {
-			buttons.b_types[6].SetText("set-player-jump-setting", string(settings.PlayerJump))
-		}
-
+		set_control_setting(&settings.PlayerJump, "jump", input_box, buttons, settings)
 		rl.BeginDrawing()
 	})
 
 	buttons.b_types[6].NewButton("set-player-kick-setting", int32(rl.GetScreenWidth()/2)-150, 400, string(settings.PlayerKick), 60, func(button *Button) {
 		rl.EndDrawing()
-
-		key_pressed := rl.GetKeyPressed()
-		for key_pressed == 0 {
-			window_manager()
-			rl.BeginDrawing()
-			rl.ClearBackground(rl.SkyBlue)
-			rl.DrawTexture(*input_box, int32(rl.GetScreenWidth()/2)-500, 300, rl.White)
-			rl.DrawText("PRESS A KEY", int32(rl.GetScreenWidth()/2)-rl.MeasureText("PRESS A KEY", 60)/2, 345, 60, rl.Black)
-			rl.EndDrawing()
-			key_pressed = rl.GetKeyPressed()
-		}
-
-		settings.PlayerKick = key_pressed
-
-		if key_pressed == rl.KeySpace {
-			buttons.b_types[6].SetText("set-player-kick-setting", "SPACE")
-		} else {
-			buttons.b_types[6].SetText("set-player-kick-setting", string(settings.PlayerKick))
-		}
-
+		set_control_setting(&settings.PlayerKick, "kick", input_box, buttons, settings)
 		rl.BeginDrawing()
 	})
 

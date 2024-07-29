@@ -43,12 +43,7 @@ func main() {
 	wait_for_server := false
 	server_err := error(nil)
 	err := error(nil)
-	settings := Settings{
-		PlayerLeft:  rl.KeyA,
-		PlayerRight: rl.KeyD,
-		PlayerJump:  rl.KeyW,
-		PlayerKick:  rl.KeySpace,
-	}
+	settings := load_settings()
 
 	player_textures := [][3]rl.Texture2D{
 		{

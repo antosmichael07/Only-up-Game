@@ -1,14 +1,15 @@
 package main
 
 import (
+	"fmt"
 	"sync"
 
 	lgr "github.com/antosmichael07/Go-Logger"
 	tcp "github.com/antosmichael07/Go-TCP-Connection"
 )
 
-func run_server(wg *sync.WaitGroup, wait_for_server *bool, err *error) {
-	server := tcp.NewServer(":24680")
+func run_server(wg *sync.WaitGroup, wait_for_server *bool, err *error, settings *Settings) {
+	server := tcp.NewServer(fmt.Sprintf(":%d", settings.Port))
 	server.Logger.Level = lgr.None
 	players := map[[64]byte]byte{}
 
