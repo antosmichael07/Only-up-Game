@@ -61,18 +61,24 @@ func main() {
 	})
 
 	go func() {
+		logger, err := lgr.NewLogger("SERVER", "logs", true)
+		if err != nil {
+			logger.Output.File = false
+			logger.Log(lgr.Error, "failed to open logger files, logging to console only")
+		}
+
 		for {
 			str := ""
 			fmt.Scanf("%s", &str)
 
 			switch str {
 			case "stop":
-				fmt.Println("stopping the server...")
+				logger.Log(lgr.Info, "stopping the server...")
 				server.Stop()
 				return
 
 			default:
-				fmt.Println("unknown command")
+				logger.Log(lgr.Error, "unknown command")
 			}
 		}
 	}()
