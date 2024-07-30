@@ -1,7 +1,9 @@
 package main
 
 import (
+	"encoding/binary"
 	"fmt"
+	"math"
 	"os"
 	"time"
 
@@ -19,13 +21,21 @@ const (
 	event_side_launcher_launched
 )
 
+type Vector2 struct {
+	X float32
+	Y float32
+}
+
 func main() {
 	server := tcp.NewServer(fmt.Sprintf(":%s", os.Args[1]))
 	server.Logger.Level = lgr.None
 	players := map[[64]byte]byte{}
+	players_loc := map[[64]byte]Vector2{}
 
 	server.On(event_player_change, func(data *[]byte, conn *tcp.Connection) {
 		if len(*data) == 20 {
+			players_loc[conn.Token] = Vector2{X: bytes_to_float32((*data)[:4]), Y: bytes_to_float32((*data)[4:8])}
+
 			server.SendDataToAll(event_player_change, data)
 		}
 	})
@@ -59,6 +69,7 @@ func main() {
 
 	server.OnDisconnect(func(conn *tcp.Connection) {
 		server.SendDataToAll(event_player_leave, &[]byte{players[conn.Token]})
+		delete(players_loc, conn.Token)
 		delete(players, conn.Token)
 		for i := range players {
 			if players[i] > players[conn.Token] {
@@ -125,4 +136,9 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	}
+}
+
+func bytes_to_float32(bytes []byte) float32 {
+	bits := binary.LittleEndian.Uint32(bytes)
+	return math.Float32frombits(bits)
 }

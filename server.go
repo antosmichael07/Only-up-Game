@@ -6,15 +6,19 @@ import (
 
 	lgr "github.com/antosmichael07/Go-Logger"
 	tcp "github.com/antosmichael07/Go-TCP-Connection"
+	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
 func run_server(wg *sync.WaitGroup, wait_for_server *bool, err *error, settings *Settings) {
 	server := tcp.NewServer(fmt.Sprintf(":%d", settings.Port))
 	server.Logger.Level = lgr.None
 	players := map[[64]byte]byte{}
+	players_loc := map[[64]byte]rl.Vector2{}
 
 	server.On(event_player_change, func(data *[]byte, conn *tcp.Connection) {
 		if len(*data) == 20 {
+			players_loc[conn.Token] = rl.Vector2{X: bytes_to_float32((*data)[:4]), Y: bytes_to_float32((*data)[4:8])}
+
 			server.SendDataToAll(event_player_change, data)
 		}
 	})
@@ -48,6 +52,7 @@ func run_server(wg *sync.WaitGroup, wait_for_server *bool, err *error, settings 
 
 	server.OnDisconnect(func(conn *tcp.Connection) {
 		server.SendDataToAll(event_player_leave, &[]byte{players[conn.Token]})
+		delete(players_loc, conn.Token)
 		delete(players, conn.Token)
 		for i := range players {
 			if players[i] > players[conn.Token] {
