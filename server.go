@@ -14,11 +14,15 @@ func run_server(wg *sync.WaitGroup, wait_for_server *bool, err *error, settings 
 	players := map[[64]byte]byte{}
 
 	server.On(event_player_change, func(data *[]byte, conn *tcp.Connection) {
-		server.SendDataToAll(event_player_change, data)
+		if len(*data) == 20 {
+			server.SendDataToAll(event_player_change, data)
+		}
 	})
 
 	server.On(event_player_kick, func(data *[]byte, conn *tcp.Connection) {
-		server.SendDataToAll(event_player_kick, data)
+		if len(*data) == 6 {
+			server.SendDataToAll(event_player_kick, data)
+		}
 	})
 
 	server.On(event_i_wanna_leave, func(data *[]byte, conn *tcp.Connection) {
@@ -31,7 +35,9 @@ func run_server(wg *sync.WaitGroup, wait_for_server *bool, err *error, settings 
 	})
 
 	server.On(event_side_launcher_launched, func(data *[]byte, conn *tcp.Connection) {
-		server.SendDataToAll(event_side_launcher_launched, data)
+		if len(*data) == 1 {
+			server.SendDataToAll(event_side_launcher_launched, data)
+		}
 	})
 
 	server.OnConnect(func(conn *tcp.Connection) {
