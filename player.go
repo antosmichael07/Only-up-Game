@@ -91,7 +91,7 @@ func (player *Player) Drawing(player_textures *[][3]rl.Texture2D) {
 }
 
 func (player *Player) Draw(textures *[3]rl.Texture2D) {
-	if player.Keys[0] != 1 && player.Keys[1] != 1 && player.Gravity == 0 && player.SideLauncherPower == 0 {
+	if ((player.Keys[0] != 1 && player.Keys[1] != 1) || (player.Keys[0] == 1 && player.Keys[1] == 1)) && player.Gravity == 0 && player.SideLauncherPower == 0 {
 		rl.DrawTexture((*textures)[0], int32(player.Position.X), int32(player.Position.Y), rl.White)
 		player.AnimationTimer = 0
 		return
@@ -115,7 +115,8 @@ func (player *Player) Movement(collision_rects *[]rl.Rectangle) {
 		if player.SideLauncherPower == 0 {
 			player.Move(collision_rects, player.Speed*float32(player.Direction))
 		}
-	} else if player.Keys[1] == 1 {
+	}
+	if player.Keys[1] == 1 {
 		player.Direction = 1
 		if player.SideLauncherPower == 0 {
 			player.Move(collision_rects, player.Speed*float32(player.Direction))
