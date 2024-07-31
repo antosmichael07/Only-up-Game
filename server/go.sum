@@ -1,4 +1,4 @@
-github.com/antosmichael07/Go-Logger v1.17.0 h1:rXpsW3rs7kZDWzOOpn856Q0YQw+oDm6mScBDkN4xD8Y=
-github.com/antosmichael07/Go-Logger v1.17.0/go.mod h1:v+v085J0A+Cdi76SanfvKA10216jy45azC6VM+sh16Q=
-github.com/antosmichael07/Go-TCP-Connection v1.53.2 h1:9OjHONZ5qPRP9lfVzHCXZAIRv9p0mad8wsLAAYf6CV0=
-github.com/antosmichael07/Go-TCP-Connection v1.53.2/go.mod h1:MpT2kgBQb7g26V6q1fa1pyznn9siEF4rSgMx9yfIhqc=
+github.com/antosmichael07/Go-Logger v1.18.0 h1:4S41waZ1f0QQ1Kbj20fBkNOGkeGOXrAMk1XuAXLY/MQ=
+github.com/antosmichael07/Go-Logger v1.18.0/go.mod h1:v+v085J0A+Cdi76SanfvKA10216jy45azC6VM+sh16Q=
+github.com/antosmichael07/Go-TCP-Connection v1.53.3 h1:hidcfcIGzl91VIQ8T+L+4PGvTlOmlUF55m2wwg+LHNE=
+github.com/antosmichael07/Go-TCP-Connection v1.53.3/go.mod h1:cwlW4tExspNdJegnsXVM3111wsaluHCBtxHmPy+DsSs=

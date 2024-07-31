@@ -27,7 +27,22 @@ type Vector2 struct {
 }
 
 func main() {
-	server := tcp.NewServer(fmt.Sprintf(":%s", os.Args[1]))
+	var server tcp.Server
+
+	logger, lgr_err := lgr.NewLogger("SERVER", "logs", true)
+	if lgr_err != nil {
+		logger.Output.File = false
+		logger.Log(lgr.Error, "failed to open logger files, logging to console only")
+	}
+
+	if len(os.Args) < 2 {
+		logger.Log(lgr.Warning, "usage: server.exe <port>")
+		logger.Log(lgr.Info, "starting server on default port 24680...")
+		server = tcp.NewServer(":24680")
+	} else {
+		server = tcp.NewServer(fmt.Sprintf(":%s", os.Args[1]))
+	}
+
 	server.Logger.Level = lgr.None
 	players := map[[64]byte]byte{}
 	players_loc := map[[64]byte]Vector2{}
@@ -78,11 +93,6 @@ func main() {
 		}
 	})
 
-	logger, lgr_err := lgr.NewLogger("SERVER", "logs", true)
-	if lgr_err != nil {
-		logger.Output.File = false
-		logger.Log(lgr.Error, "failed to open logger files, logging to console only")
-	}
 	logger.Log(lgr.Info, "server is starting...")
 
 	server.OnStart(func() {
