@@ -163,9 +163,65 @@ func main() {
 
 			switch str {
 			case "stop":
+				if len(players_loc) > 0 {
+					var highest_player Vector2
+					for i := range players_loc {
+						if (players_loc)[i].Y > highest_player.Y {
+							highest_player = (players_loc)[i]
+						}
+					}
+
+					saved_highest_loc.X = highest_player.X
+					saved_highest_loc.Y = highest_player.Y
+
+					_, err := file.WriteAt(append(float32_to_bytes(highest_player.X), float32_to_bytes(highest_player.Y)...), 0)
+					if err != nil {
+						logger.Log(lgr.Error, "auto-save: failed to write to save file")
+					} else {
+						logger.Log(lgr.Info, "auto-save: saved the highest location")
+					}
+				} else {
+					logger.Log(lgr.Warning, "no players online to save the highest location")
+
+					logger.Log(lgr.Info, "write 'Y' to stop the server without saving the highest location")
+
+					dump := ""
+					fmt.Scanln(&dump)
+
+					var input string
+					fmt.Scanf("%s", &input)
+
+					if input != "Y" {
+						logger.Log(lgr.Info, "canceled stopping the server")
+						continue
+					}
+				}
+
 				logger.Log(lgr.Info, "stopping the server...")
 				server.Stop()
 				return
+
+			case "save":
+				if len(players_loc) > 0 {
+					var highest_player Vector2
+					for i := range players_loc {
+						if (players_loc)[i].Y > highest_player.Y {
+							highest_player = (players_loc)[i]
+						}
+					}
+
+					saved_highest_loc.X = highest_player.X
+					saved_highest_loc.Y = highest_player.Y
+
+					_, err := file.WriteAt(append(float32_to_bytes(highest_player.X), float32_to_bytes(highest_player.Y)...), 0)
+					if err != nil {
+						logger.Log(lgr.Error, "failed to write to save file")
+					} else {
+						logger.Log(lgr.Info, "saved the highest location")
+					}
+				} else {
+					logger.Log(lgr.Warning, "no players online to save the highest location")
+				}
 
 			default:
 				logger.Log(lgr.Error, "unknown command")
