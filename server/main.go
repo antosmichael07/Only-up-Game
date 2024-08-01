@@ -234,7 +234,7 @@ func main() {
 	err := server.Start()
 
 	if err != nil {
-		fmt.Println(err)
+		logger.Log(lgr.Error, "%s", err)
 	}
 }
 
