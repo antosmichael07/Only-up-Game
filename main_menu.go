@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"sync"
 
 	lgr "github.com/antosmichael07/Go-Logger"
 	tcp "github.com/antosmichael07/Go-TCP-Connection"
@@ -89,7 +88,7 @@ func init_buttons(buttons *Buttons, input_box *rl.Texture2D, should_close_connec
 		}
 	})
 
-	buttons.b_types[0].NewButton("host", int32(rl.GetScreenWidth()/2)-300, 300, "HOST", 60, func(button *Button) {
+	/*buttons.b_types[0].NewButton("host", int32(rl.GetScreenWidth()/2)-300, 300, "HOST", 60, func(button *Button) {
 		rl.EndDrawing()
 
 		var wg_server sync.WaitGroup
@@ -151,9 +150,9 @@ func init_buttons(buttons *Buttons, input_box *rl.Texture2D, should_close_connec
 		wg_server.Done()
 
 		rl.BeginDrawing()
-	})
+	})*/
 
-	buttons.b_types[0].NewButton("open-settings", int32(rl.GetScreenWidth()/2)-300, 500, "SETTINGS", 60, func(button *Button) {
+	buttons.b_types[0].NewButton("open-settings", int32(rl.GetScreenWidth()/2)-300, 300, "SETTINGS", 60, func(button *Button) {
 		*is_settings_open = true
 
 		rl.EndDrawing()

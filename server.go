@@ -1,8 +1,10 @@
 package main
 
-import (
+/*import (
 	"fmt"
+	"os"
 	"sync"
+	"time"
 
 	lgr "github.com/antosmichael07/Go-Logger"
 	tcp "github.com/antosmichael07/Go-TCP-Connection"
@@ -73,3 +75,31 @@ func run_server(wg *sync.WaitGroup, wait_for_server *bool, err *error, settings 
 
 	*err = server.Start()
 }
+
+func saving(file *os.File, players_loc *map[[64]byte]rl.Vector2, saved_highest_loc *rl.Vector2) {
+	go func() {
+		for {
+			time.Sleep(2 * time.Minute)
+
+			if len(*players_loc) > 0 {
+				var highest_player rl.Vector2
+				for i := range *players_loc {
+					if (*players_loc)[i].Y > highest_player.Y {
+						highest_player = (*players_loc)[i]
+					}
+				}
+
+				saved_highest_loc.X = highest_player.X
+				saved_highest_loc.Y = highest_player.Y
+
+				_, err := file.WriteAt(append(float32_to_bytes(highest_player.X), float32_to_bytes(highest_player.Y)...), 0)
+				if err != nil {
+					//logger.Log(lgr.Error, "auto-save: failed to write to save file")
+				} else {
+					//logger.Log(lgr.Info, "auto-save: saved the highest location")
+				}
+			}
+		}
+	}()
+}
+*/
