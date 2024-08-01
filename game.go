@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"sync"
 	"time"
 
@@ -33,6 +34,7 @@ func game_loop(should_close_connection *bool, client *tcp.Client, player_texture
 	players, collision_rects, side_launchers, launchers, camera := init_game()
 	player_num := byte(255)
 	remove_player := byte(255)
+	player_loc := rl.Vector2{}
 
 	var wg_disconnect sync.WaitGroup
 	wg_disconnect.Add(2)
@@ -42,7 +44,7 @@ func game_loop(should_close_connection *bool, client *tcp.Client, player_texture
 
 	var wg sync.WaitGroup
 	wg.Add(1)
-	go connection(&players, &wg, &player_num, &remove_player, should_close_connection, &wg_disconnect, client, &wait_player_num_wg, &side_launchers)
+	go connection(&players, &wg, &player_num, &remove_player, should_close_connection, &wg_disconnect, client, &wait_player_num_wg, &side_launchers, &player_loc)
 	go func() {
 		time.Sleep(5 * time.Second)
 		if player_num == 255 {
@@ -57,6 +59,7 @@ func game_loop(should_close_connection *bool, client *tcp.Client, player_texture
 		window_manager()
 		rl.BeginDrawing()
 		rl.ClearBackground(rl.SkyBlue)
+		draw_meters(&players, &player_num)
 		rl.BeginMode2D(camera)
 		update_camera(&players, &camera, &player_num)
 
@@ -106,4 +109,8 @@ func game_loop(should_close_connection *bool, client *tcp.Client, player_texture
 func update_camera(players *[]Player, camera *rl.Camera2D, player_num *byte) {
 	camera.Target.X = rl.Lerp(camera.Target.X, (*players)[*player_num].Position.X+12.5, 0.05*(*players)[*player_num].FrameTime)
 	camera.Target.Y = rl.Lerp(camera.Target.Y, (*players)[*player_num].Position.Y, 0.05*(*players)[*player_num].FrameTime)
+}
+
+func draw_meters(players *[]Player, player_num *byte) {
+	rl.DrawText(fmt.Sprintf("%d", int32((*players)[*player_num].Position.Y/20)*-1), 20, 20, 100, rl.Black)
 }

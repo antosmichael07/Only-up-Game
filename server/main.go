@@ -46,6 +46,7 @@ func main() {
 	server.Logger.Level = lgr.None
 	players := map[[64]byte]byte{}
 	players_loc := map[[64]byte]Vector2{}
+	saved_highest_loc := Vector2{X: 0, Y: 0}
 
 	server.On(event_player_change, func(data *[]byte, conn *tcp.Connection) {
 		if len(*data) == 20 {
@@ -78,7 +79,10 @@ func main() {
 
 	server.OnConnect(func(conn *tcp.Connection) {
 		players[conn.Token] = byte(len(server.Connections) - 1)
-		server.SendData(conn, event_player_num, &[]byte{byte(len(players) - 1)})
+		to_send := []byte{byte(len(players) - 1)}
+		to_send = append(to_send, float32_to_bytes(saved_highest_loc.X)...)
+		to_send = append(to_send, float32_to_bytes(saved_highest_loc.Y)...)
+		server.SendData(conn, event_player_num, &to_send)
 		server.SendDataToAll(event_new_player, &[]byte{byte(len(players))})
 	})
 
@@ -92,6 +96,36 @@ func main() {
 			}
 		}
 	})
+
+	var file *os.File
+	if _, err := os.Stat("save"); os.IsNotExist(err) {
+		logger.Log(lgr.Warning, "no save file found, creating a new one")
+		if file, err = os.Create("save"); err != nil {
+			logger.Log(lgr.Error, "failed to create save file")
+		} else {
+			_, err = file.Write(append(float32_to_bytes(0), float32_to_bytes(0)...))
+			if err != nil {
+				logger.Log(lgr.Error, "failed to write to save file")
+			}
+
+			go saving(file, &players_loc, &logger, &saved_highest_loc)
+		}
+	} else {
+		if file, err = os.OpenFile("save", os.O_RDWR, 0644); err != nil {
+			logger.Log(lgr.Error, "failed to open save file")
+		} else {
+			data := make([]byte, 8)
+			_, err = file.ReadAt(data, 0)
+			if err != nil {
+				logger.Log(lgr.Error, "failed to read save file")
+			} else {
+				saved_highest_loc.X = bytes_to_float32(data[:4])
+				saved_highest_loc.Y = bytes_to_float32(data[4:])
+			}
+
+			go saving(file, &players_loc, &logger, &saved_highest_loc)
+		}
+	}
 
 	logger.Log(lgr.Info, "server is starting...")
 
@@ -151,4 +185,38 @@ func main() {
 func bytes_to_float32(bytes []byte) float32 {
 	bits := binary.LittleEndian.Uint32(bytes)
 	return math.Float32frombits(bits)
+}
+
+func float32_to_bytes(f float32) []byte {
+	bytes := make([]byte, 4)
+	bits := math.Float32bits(f)
+	binary.LittleEndian.PutUint32(bytes, bits)
+	return bytes
+}
+
+func saving(file *os.File, players_loc *map[[64]byte]Vector2, logger *lgr.Logger, saved_highest_loc *Vector2) {
+	go func() {
+		for {
+			time.Sleep(1 * time.Minute)
+
+			if len(*players_loc) > 0 {
+				var highest_player Vector2
+				for i := range *players_loc {
+					if (*players_loc)[i].Y > highest_player.Y {
+						highest_player = (*players_loc)[i]
+					}
+				}
+
+				saved_highest_loc.X = highest_player.X
+				saved_highest_loc.Y = highest_player.Y
+
+				_, err := file.WriteAt(append(float32_to_bytes(highest_player.X), float32_to_bytes(highest_player.Y)...), 0)
+				if err != nil {
+					logger.Log(lgr.Error, "auto-save: failed to write to save file")
+				} else {
+					logger.Log(lgr.Info, "auto-save: saved the highest location")
+				}
+			}
+		}
+	}()
 }

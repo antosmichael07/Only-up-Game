@@ -18,7 +18,7 @@ const (
 	event_side_launcher_launched
 )
 
-func connection(players *[]Player, wg *sync.WaitGroup, player_num *byte, remove_player *byte, should_close_connection *bool, wg_disconnect *sync.WaitGroup, client *tcp.Client, wait_player_num_wg *sync.WaitGroup, side_launchers *[]SideLauncher) {
+func connection(players *[]Player, wg *sync.WaitGroup, player_num *byte, remove_player *byte, should_close_connection *bool, wg_disconnect *sync.WaitGroup, client *tcp.Client, wait_player_num_wg *sync.WaitGroup, side_launchers *[]SideLauncher, player_loc *rl.Vector2) {
 	wait_player_num := byte(255)
 
 	client.On(event_player_leave, func(data *[]byte) {
@@ -32,6 +32,7 @@ func connection(players *[]Player, wg *sync.WaitGroup, player_num *byte, remove_
 			}
 			wait_player_num_wg.Wait()
 			*player_num = wait_player_num
+			(*players)[*player_num].Position = *player_loc
 			wg.Done()
 		} else {
 			*players = append(*players, NewPlayer())
@@ -40,6 +41,9 @@ func connection(players *[]Player, wg *sync.WaitGroup, player_num *byte, remove_
 
 	client.On(event_player_num, func(data *[]byte) {
 		wait_player_num = (*data)[0]
+		player_loc.X = bytes_to_float32((*data)[1:5])
+		player_loc.Y = bytes_to_float32((*data)[5:])
+
 		wait_player_num_wg.Done()
 	})
 
