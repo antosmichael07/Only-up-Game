@@ -46,7 +46,7 @@ func main() {
 	server.Logger.Level = lgr.None
 	players := map[[64]byte]byte{}
 	players_loc := map[[64]byte]Vector2{}
-	saved_highest_loc := Vector2{X: 0, Y: 0}
+	saved_highest_loc := Vector2{X: 100, Y: 100}
 
 	server.On(event_player_change, func(data *[]byte, conn *tcp.Connection) {
 		if len(*data) == 20 {
@@ -103,7 +103,7 @@ func main() {
 		if file, err = os.Create("save"); err != nil {
 			logger.Log(lgr.Error, "failed to create save file")
 		} else {
-			_, err = file.Write(append(float32_to_bytes(0), float32_to_bytes(0)...))
+			_, err = file.Write(append(float32_to_bytes(100), float32_to_bytes(100)...))
 			if err != nil {
 				logger.Log(lgr.Error, "failed to write to save file")
 			}
@@ -223,6 +223,14 @@ func main() {
 					logger.Log(lgr.Warning, "no players online to save the highest location")
 				}
 
+			case "listen":
+				server.ShouldListen = !server.ShouldListen
+				if server.ShouldListen {
+					logger.Log(lgr.Info, "server is now listening for new connections")
+				} else {
+					logger.Log(lgr.Info, "server is not listening for new connections")
+				}
+
 			default:
 				logger.Log(lgr.Error, "unknown command")
 			}
@@ -253,7 +261,7 @@ func float32_to_bytes(f float32) []byte {
 func saving(file *os.File, players_loc *map[[64]byte]Vector2, logger *lgr.Logger, saved_highest_loc *Vector2) {
 	go func() {
 		for {
-			time.Sleep(1 * time.Minute)
+			time.Sleep(2 * time.Minute)
 
 			if len(*players_loc) > 0 {
 				var highest_player Vector2
