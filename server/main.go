@@ -184,8 +184,7 @@ func main() {
 
 					_, err := file.WriteAt(append(float32_to_bytes(highest_player.X), float32_to_bytes(highest_player.Y)...), 0)
 					if err != nil {
-						logger.Log(lgr.Error, "auto-save: failed to write to save file")
-						logger.Log(lgr.Info, "write 'Y' to stop the server without saving the highest location")
+						logger.Log(lgr.Error, "failed to write to save file, write 'Y' to stop the server without saving the highest location")
 
 						dump := ""
 						fmt.Scanln(&dump)
@@ -198,11 +197,10 @@ func main() {
 							continue
 						}
 					} else {
-						logger.Log(lgr.Info, "auto-save: saved the highest location")
+						logger.Log(lgr.Info, "saved the highest location")
 					}
 				} else {
-					logger.Log(lgr.Warning, "no players online to save the highest location")
-					logger.Log(lgr.Info, "write 'Y' to stop the server without saving the highest location")
+					logger.Log(lgr.Warning, "no players online to save the highest location, write 'Y' to stop the server without saving the highest location")
 
 					dump := ""
 					fmt.Scanln(&dump)
