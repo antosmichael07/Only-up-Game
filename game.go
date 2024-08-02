@@ -14,23 +14,21 @@ func init_game() ([]Player, []rl.Rectangle, []SideLauncher, []Launcher, rl.Camer
 	players := []Player{}
 
 	collision_rects := []rl.Rectangle{
-		rl.NewRectangle(25, 160, 250, 25),
-		rl.NewRectangle(25, 150, 80, 10),
-		rl.NewRectangle(140, 150, 25, 10),
+		rl.NewRectangle(-200, 200, 500, 25),
 	}
 
-	side_launchers := []SideLauncher{
-		NewSideLauncher(25, 90, 6, &collision_rects),
-	}
+	side_launchers := []SideLauncher{}
 
-	launchers := []Launcher{}
+	launchers := []Launcher{
+		NewLauncher(0, 190, 8, &collision_rects),
+	}
 
 	camera := rl.NewCamera2D(rl.NewVector2(float32(rl.GetScreenWidth()/2), float32(rl.GetScreenHeight()/2)), rl.NewVector2(225, 0), 0, 4)
 
 	return players, collision_rects, side_launchers, launchers, camera
 }
 
-func game_loop(should_close_connection *bool, client *tcp.Client, player_textures *[][3]rl.Texture2D, arrow *rl.Texture2D, buttons *Buttons, is_game_menu_open *bool, side_launcher_textures *[2][4]rl.Texture2D, err *error, settings *Settings) {
+func game_loop(should_close_connection *bool, client *tcp.Client, player_textures *[][3]rl.Texture2D, arrow *rl.Texture2D, buttons *Buttons, is_game_menu_open *bool, side_launcher_textures *[2][4]rl.Texture2D, err *error, settings *Settings, launchers_textures *[2]rl.Texture2D) {
 	players, collision_rects, side_launchers, launchers, camera := init_game()
 	player_num := byte(255)
 	remove_player := byte(255)
@@ -44,7 +42,7 @@ func game_loop(should_close_connection *bool, client *tcp.Client, player_texture
 
 	var wg sync.WaitGroup
 	wg.Add(1)
-	go connection(&players, &wg, &player_num, &remove_player, should_close_connection, &wg_disconnect, client, &wait_player_num_wg, &side_launchers, &player_loc)
+	go connection(&players, &wg, &player_num, &remove_player, should_close_connection, &wg_disconnect, client, &wait_player_num_wg, &side_launchers, &player_loc, &launchers)
 	go func() {
 		time.Sleep(5 * time.Second)
 		if player_num == 255 {
@@ -75,7 +73,7 @@ func game_loop(should_close_connection *bool, client *tcp.Client, player_texture
 			side_launchers[i].Update(side_launcher_textures)
 		}
 		for i := 0; i < len(launchers); i++ {
-			rl.DrawRectangleRec(launchers[i].Rect, rl.Green)
+			launchers[i].Update(launchers_textures)
 		}
 
 		rl.EndMode2D()
@@ -108,7 +106,7 @@ func game_loop(should_close_connection *bool, client *tcp.Client, player_texture
 
 func update_camera(players *[]Player, camera *rl.Camera2D, player_num *byte) {
 	camera.Target.X = rl.Lerp(camera.Target.X, (*players)[*player_num].Position.X+12.5, 0.05*(*players)[*player_num].FrameTime)
-	camera.Target.Y = rl.Lerp(camera.Target.Y, (*players)[*player_num].Position.Y, 0.05*(*players)[*player_num].FrameTime)
+	camera.Target.Y = rl.Lerp(camera.Target.Y, (*players)[*player_num].Position.Y, 0.1*(*players)[*player_num].FrameTime)
 }
 
 func draw_meters(players *[]Player, player_num *byte) {

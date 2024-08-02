@@ -19,6 +19,7 @@ const (
 	event_player_kick
 	event_i_wanna_leave
 	event_side_launcher_launched
+	event_launcher_launched
 )
 
 type Vector2 struct {
@@ -47,6 +48,7 @@ func main() {
 	players := map[[64]byte]byte{}
 	players_loc := map[[64]byte]Vector2{}
 	saved_highest_loc := Vector2{X: 100, Y: 100}
+	auto_save := true
 
 	server.On(event_player_change, func(data *[]byte, conn *tcp.Connection) {
 		if len(*data) == 20 {
@@ -74,6 +76,12 @@ func main() {
 	server.On(event_side_launcher_launched, func(data *[]byte, conn *tcp.Connection) {
 		if len(*data) == 1 {
 			server.SendDataToAll(event_side_launcher_launched, data)
+		}
+	})
+
+	server.On(event_launcher_launched, func(data *[]byte, conn *tcp.Connection) {
+		if len(*data) == 1 {
+			server.SendDataToAll(event_launcher_launched, data)
 		}
 	})
 
@@ -108,7 +116,7 @@ func main() {
 				logger.Log(lgr.Error, "failed to write to save file")
 			}
 
-			go saving(file, &players_loc, &logger, &saved_highest_loc)
+			go saving(file, &players_loc, &logger, &saved_highest_loc, &auto_save)
 		}
 	} else {
 		if file, err = os.OpenFile("save", os.O_RDWR, 0644); err != nil {
@@ -123,7 +131,7 @@ func main() {
 				saved_highest_loc.Y = bytes_to_float32(data[4:])
 			}
 
-			go saving(file, &players_loc, &logger, &saved_highest_loc)
+			go saving(file, &players_loc, &logger, &saved_highest_loc, &auto_save)
 		}
 	}
 
@@ -177,12 +185,23 @@ func main() {
 					_, err := file.WriteAt(append(float32_to_bytes(highest_player.X), float32_to_bytes(highest_player.Y)...), 0)
 					if err != nil {
 						logger.Log(lgr.Error, "auto-save: failed to write to save file")
+						logger.Log(lgr.Info, "write 'Y' to stop the server without saving the highest location")
+
+						dump := ""
+						fmt.Scanln(&dump)
+
+						var input string
+						fmt.Scanf("%s", &input)
+
+						if input != "Y" {
+							logger.Log(lgr.Info, "canceled stopping the server")
+							continue
+						}
 					} else {
 						logger.Log(lgr.Info, "auto-save: saved the highest location")
 					}
 				} else {
 					logger.Log(lgr.Warning, "no players online to save the highest location")
-
 					logger.Log(lgr.Info, "write 'Y' to stop the server without saving the highest location")
 
 					dump := ""
@@ -231,6 +250,14 @@ func main() {
 					logger.Log(lgr.Info, "server is not listening for new connections")
 				}
 
+			case "auto-save":
+				auto_save = !auto_save
+				if auto_save {
+					logger.Log(lgr.Info, "auto-save is now enabled")
+				} else {
+					logger.Log(lgr.Info, "auto-save is now disabled")
+				}
+
 			default:
 				logger.Log(lgr.Error, "unknown command")
 			}
@@ -258,12 +285,12 @@ func float32_to_bytes(f float32) []byte {
 	return bytes
 }
 
-func saving(file *os.File, players_loc *map[[64]byte]Vector2, logger *lgr.Logger, saved_highest_loc *Vector2) {
+func saving(file *os.File, players_loc *map[[64]byte]Vector2, logger *lgr.Logger, saved_highest_loc *Vector2, auto_save *bool) {
 	go func() {
 		for {
 			time.Sleep(2 * time.Minute)
 
-			if len(*players_loc) > 0 {
+			if *auto_save && len(*players_loc) > 0 {
 				var highest_player Vector2
 				for i := range *players_loc {
 					if (*players_loc)[i].Y > highest_player.Y {

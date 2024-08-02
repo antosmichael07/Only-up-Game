@@ -24,11 +24,6 @@ type Player struct {
 	Kicking            bool
 }
 
-type Launcher struct {
-	Rect  rl.Rectangle
-	Power float32
-}
-
 func NewPlayer() Player {
 	player := Player{}
 	player.Position = rl.NewVector2(100, 100)
@@ -49,10 +44,10 @@ func NewPlayer() Player {
 func (player *Player) Update(collision_rects *[]rl.Rectangle, side_launchers *[]SideLauncher, launchers *[]Launcher, player_textures *[][3]rl.Texture2D, players *[]Player, client *tcp.Client) {
 	player.FrameTime = rl.GetFrameTime() * 60
 
-	player.Movement(collision_rects)
+	launched := player.Launcher(launchers, client)
+	player.Movement(collision_rects, &launched)
 	player.Fall(collision_rects)
 	player.SideLauncher(side_launchers, collision_rects, client)
-	player.Launcher(launchers)
 	player.Drawing(player_textures)
 }
 
@@ -109,7 +104,7 @@ func (player *Player) Draw(textures *[3]rl.Texture2D) {
 	}
 }
 
-func (player *Player) Movement(collision_rects *[]rl.Rectangle) {
+func (player *Player) Movement(collision_rects *[]rl.Rectangle, launched *bool) {
 	if player.Keys[0] == 1 {
 		player.Direction = -1
 		if player.SideLauncherPower == 0 {
@@ -123,7 +118,7 @@ func (player *Player) Movement(collision_rects *[]rl.Rectangle) {
 		}
 	}
 
-	if player.Keys[2] == 1 && player.OnGround(collision_rects) {
+	if player.Keys[2] == 1 && player.OnGround(collision_rects) && !*launched {
 		player.Gravity = player.JumpPower
 	}
 }
@@ -235,15 +230,19 @@ func (player *Player) SideLauncher(side_launchers *[]SideLauncher, collision_rec
 	player.Position.X += player.SideLauncherPower * player.FrameTime
 }
 
-func (player *Player) Launcher(launchers *[]Launcher) {
+func (player *Player) Launcher(launchers *[]Launcher, client *tcp.Client) bool {
 	player_rect := rl.NewRectangle(player.Position.X, player.Position.Y, player.Scale.X, player.Scale.Y)
 
 	for i := 0; i < len(*launchers); i++ {
-		if rl.CheckCollisionRecs(player_rect, (*launchers)[i].Rect) {
+		if rl.CheckCollisionRecs(player_rect, (*launchers)[i].Rect) && (*launchers)[i].AnimationTimer <= 0 {
 			player.Gravity = (*launchers)[i].Power
-			break
+			(*launchers)[i].AnimationTimer = 1
+			client.SendData(event_launcher_launched, &[]byte{byte(i)})
+			return true
 		}
 	}
+
+	return false
 }
 
 func (player *Player) Kick(players *[]Player, player_num *byte, client *tcp.Client, settings *Settings) {
