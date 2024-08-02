@@ -239,7 +239,7 @@ func main() {
 						logger.Log(lgr.Info, "saved the highest location")
 					}
 				} else {
-					logger.Log(lgr.Warning, "no players online to save the highest location")
+					logger.Log(lgr.Error, "no players online to save the highest location")
 				}
 
 			case "listen":
@@ -257,6 +257,9 @@ func main() {
 				} else {
 					logger.Log(lgr.Info, "auto-save is now disabled")
 				}
+
+			case "help":
+				logger.Log(lgr.Info, "commands: stop, save, listen, auto-save, help")
 
 			default:
 				logger.Log(lgr.Error, "unknown command")
