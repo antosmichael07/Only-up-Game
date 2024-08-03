@@ -5,6 +5,7 @@ import (
 )
 
 type Buttons struct {
+	sound          *rl.Sound
 	pressed_button bool
 	b_types        []ButtonType
 }
@@ -26,7 +27,7 @@ type Button struct {
 }
 
 func NewButtons() Buttons {
-	return Buttons{false, []ButtonType{}}
+	return Buttons{&rl.Sound{}, false, []ButtonType{}}
 }
 
 func (b *Buttons) NewButtonType(normal *rl.Texture2D, focused *rl.Texture2D, pressed *rl.Texture2D) {
@@ -96,6 +97,7 @@ func (b *Buttons) Draw(button_type int) {
 					rl.DrawTexture(*b.b_types[button_type].focused, b.b_types[button_type].buttons[i].position[0], b.b_types[button_type].buttons[i].position[1], rl.White)
 				}
 				if rl.IsMouseButtonPressed(rl.MouseLeftButton) && !b.pressed_button {
+					rl.PlaySound(*b.sound)
 					b.b_types[button_type].buttons[i].function(&b.b_types[button_type].buttons[i])
 					b.pressed_button = true
 					continue
@@ -109,6 +111,7 @@ func (b *Buttons) Draw(button_type int) {
 	if rl.IsMouseButtonPressed(rl.MouseLeftButton) && !b.pressed_button {
 		for i := 0; i < len(b.b_types[button_type].buttons); i++ {
 			if (len(b.b_types[button_type].buttons[i].id) < 7 || b.b_types[button_type].buttons[i].id[len(b.b_types[button_type].buttons[i].id)-7:] != "_select") && rl.CheckCollisionPointRec(rl.GetMousePosition(), rl.NewRectangle(float32(b.b_types[button_type].buttons[i].position[0]), float32(b.b_types[button_type].buttons[i].position[1]), float32(b.b_types[button_type].normal.Width), float32(b.b_types[button_type].normal.Height))) {
+				rl.PlaySound(*b.sound)
 				b.b_types[button_type].buttons[i].function(&b.b_types[button_type].buttons[i])
 				b.pressed_button = true
 				break
@@ -169,4 +172,8 @@ func (b *Buttons) Delete(id string) {
 	for i := 0; i < len(b.b_types); i++ {
 		b.b_types[i].DeleteButtonType(id)
 	}
+}
+
+func (b *Buttons) SetSound(sound *rl.Sound) {
+	b.sound = sound
 }

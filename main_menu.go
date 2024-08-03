@@ -11,6 +11,41 @@ import (
 )
 
 func main_menu(buttons *Buttons) {
+
+	if !rl.IsAudioDeviceReady() {
+		for {
+			window_manager()
+			rl.BeginDrawing()
+			rl.ClearBackground(rl.SkyBlue)
+
+			msg := "audio device didn't initialize correctly, please restart the game"
+
+			iterations := 0
+			for i := 0; i < len(msg); {
+				last_space := i
+
+				for j := i; msg[j] != '\n' && rl.MeasureText(msg[i:j+1], 60) < int32(rl.GetScreenWidth())-200; j++ {
+					if j+1 == len(msg) {
+						last_space = j + 1
+						break
+					}
+					if msg[j] == ' ' {
+						last_space = j
+					}
+				}
+
+				rl.DrawText(msg[i:last_space], int32(rl.GetScreenWidth())/2-rl.MeasureText(msg[i:last_space], 60)/2, 100+int32(70*iterations), 60, rl.Black)
+
+				i = last_space + 1
+				iterations++
+			}
+
+			buttons.Draw(11)
+
+			rl.EndDrawing()
+		}
+	}
+
 	for {
 		window_manager()
 		rl.BeginDrawing()
@@ -229,6 +264,10 @@ func init_buttons(buttons *Buttons, input_box *rl.Texture2D, should_close_connec
 		buttons.b_types[6].SetText("set-player-right-setting", "D")
 		buttons.b_types[6].SetText("set-player-jump-setting", "W")
 		buttons.b_types[6].SetText("set-player-kick-setting", "SPACE")
+	})
+
+	buttons.b_types[11].NewButton("close-err-audio", int32(rl.GetScreenWidth())/2-300, int32(rl.GetScreenHeight())-250, "EXIT", 60, func(button *Button) {
+		os.Exit(0)
 	})
 
 	if settings.PlayerLeft == rl.KeySpace {

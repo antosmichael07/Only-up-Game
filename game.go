@@ -35,6 +35,7 @@ func game_loop(should_close_connection *bool, client *tcp.Client, player_texture
 	player_num := byte(255)
 	remove_player := byte(255)
 	player_loc := rl.Vector2{}
+	var meters int32
 
 	var wg_disconnect sync.WaitGroup
 	wg_disconnect.Add(2)
@@ -59,7 +60,8 @@ func game_loop(should_close_connection *bool, client *tcp.Client, player_texture
 		window_manager()
 		rl.BeginDrawing()
 		rl.ClearBackground(rl.SkyBlue)
-		draw_meters(&players, &player_num)
+		meters = int32((players)[player_num].Position.Y/20) * -1
+		draw_meters(&meters)
 		rl.BeginMode2D(camera)
 		update_camera(&players, &camera, &player_num)
 
@@ -111,6 +113,6 @@ func update_camera(players *[]Player, camera *rl.Camera2D, player_num *byte) {
 	camera.Target.Y = rl.Lerp(camera.Target.Y, (*players)[*player_num].Position.Y, 0.1*(*players)[*player_num].FrameTime)
 }
 
-func draw_meters(players *[]Player, player_num *byte) {
-	rl.DrawText(fmt.Sprintf("%d", int32((*players)[*player_num].Position.Y/20)*-1), 20, 20, 100, rl.Black)
+func draw_meters(meters *int32) {
+	rl.DrawText(fmt.Sprintf("%d", meters), 20, 20, 100, rl.Black)
 }
