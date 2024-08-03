@@ -114,5 +114,5 @@ func update_camera(players *[]Player, camera *rl.Camera2D, player_num *byte) {
 }
 
 func draw_meters(meters *int32) {
-	rl.DrawText(fmt.Sprintf("%d", meters), 20, 20, 100, rl.Black)
+	rl.DrawText(fmt.Sprintf("%d", *meters), 20, 20, 100, rl.Black)
 }
