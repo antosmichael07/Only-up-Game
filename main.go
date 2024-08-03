@@ -89,14 +89,11 @@ func main() {
 		},
 	}
 
-	launchers_textures := [2]rl.Texture2D{
-		rl.LoadTexture("resources/textures/launcher_0.png"),
-		rl.LoadTexture("resources/textures/launcher_1.png"),
-	}
+	launcher_texture := rl.LoadTexture("resources/textures/launcher.png")
 
 	arrow := rl.LoadTexture("resources/textures/arrow.png")
 
-	init_buttons(&buttons, &input_box, &should_close_connection, &stop_trying_to_connect, &ip, &back_from_credits, &player_textures, &arrow, &go_back, &cursor, &cursor_timer, &is_game_menu_open, &err, &side_launcher_textures, &settings, &is_settings_open, &wait_for_server, &server_err, &launchers_textures)
+	init_buttons(&buttons, &input_box, &should_close_connection, &stop_trying_to_connect, &ip, &back_from_credits, &player_textures, &arrow, &go_back, &cursor, &cursor_timer, &is_game_menu_open, &err, &side_launcher_textures, &settings, &is_settings_open, &wait_for_server, &server_err, &launcher_texture)
 
 	main_menu(&buttons)
 }

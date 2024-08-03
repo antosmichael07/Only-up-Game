@@ -145,11 +145,21 @@ func (player *Player) Fall(collision_rects *[]rl.Rectangle) {
 
 	player_rect := rl.NewRectangle(player.Position.X, player.Position.Y+player.Gravity*player.FrameTime, player.Scale.X, player.Scale.Y)
 
-	for i := 0; i < len(*collision_rects); i++ {
-		if rl.CheckCollisionRecs(player_rect, (*collision_rects)[i]) {
-			player.Gravity = 0
-			player.Position.Y = (*collision_rects)[i].Y - player.Scale.Y
-			return
+	if player.Gravity > 0 {
+		for i := 0; i < len(*collision_rects); i++ {
+			if rl.CheckCollisionRecs(player_rect, (*collision_rects)[i]) {
+				player.Gravity = 0
+				player.Position.Y = (*collision_rects)[i].Y - player.Scale.Y
+				return
+			}
+		}
+	} else {
+		for i := 0; i < len(*collision_rects); i++ {
+			if rl.CheckCollisionRecs(player_rect, (*collision_rects)[i]) {
+				player.Gravity = 0
+				player.Position.Y = (*collision_rects)[i].Y + (*collision_rects)[i].Height
+				return
+			}
 		}
 	}
 
@@ -234,10 +244,8 @@ func (player *Player) Launcher(launchers *[]Launcher, client *tcp.Client) bool {
 	player_rect := rl.NewRectangle(player.Position.X, player.Position.Y, player.Scale.X, player.Scale.Y)
 
 	for i := 0; i < len(*launchers); i++ {
-		if rl.CheckCollisionRecs(player_rect, (*launchers)[i].Rect) && (*launchers)[i].AnimationTimer <= 0 {
+		if rl.CheckCollisionRecs(player_rect, (*launchers)[i].Rect) {
 			player.Gravity = (*launchers)[i].Power
-			(*launchers)[i].AnimationTimer = 1
-			client.SendData(event_launcher_launched, &[]byte{byte(i)})
 			return true
 		}
 	}

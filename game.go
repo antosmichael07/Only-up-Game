@@ -10,12 +10,14 @@ import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
-func init_game() ([]Player, []rl.Rectangle, []SideLauncher, []Launcher, rl.Camera2D) {
+func init_game() ([]Player, []rl.Rectangle, []SideLauncher, []Launcher, rl.Camera2D, int) {
 	players := []Player{}
 
 	collision_rects := []rl.Rectangle{
 		rl.NewRectangle(-200, 200, 500, 25),
 	}
+
+	collision_rect_len := len(collision_rects)
 
 	side_launchers := []SideLauncher{}
 
@@ -25,11 +27,11 @@ func init_game() ([]Player, []rl.Rectangle, []SideLauncher, []Launcher, rl.Camer
 
 	camera := rl.NewCamera2D(rl.NewVector2(float32(rl.GetScreenWidth()/2), float32(rl.GetScreenHeight()/2)), rl.NewVector2(225, 0), 0, 4)
 
-	return players, collision_rects, side_launchers, launchers, camera
+	return players, collision_rects, side_launchers, launchers, camera, collision_rect_len
 }
 
-func game_loop(should_close_connection *bool, client *tcp.Client, player_textures *[][3]rl.Texture2D, arrow *rl.Texture2D, buttons *Buttons, is_game_menu_open *bool, side_launcher_textures *[2][4]rl.Texture2D, err *error, settings *Settings, launchers_textures *[2]rl.Texture2D) {
-	players, collision_rects, side_launchers, launchers, camera := init_game()
+func game_loop(should_close_connection *bool, client *tcp.Client, player_textures *[][3]rl.Texture2D, arrow *rl.Texture2D, buttons *Buttons, is_game_menu_open *bool, side_launcher_textures *[2][4]rl.Texture2D, err *error, settings *Settings, launcher_texture *rl.Texture2D) {
+	players, collision_rects, side_launchers, launchers, camera, collision_rect_len := init_game()
 	player_num := byte(255)
 	remove_player := byte(255)
 	player_loc := rl.Vector2{}
@@ -42,7 +44,7 @@ func game_loop(should_close_connection *bool, client *tcp.Client, player_texture
 
 	var wg sync.WaitGroup
 	wg.Add(1)
-	go connection(&players, &wg, &player_num, &remove_player, should_close_connection, &wg_disconnect, client, &wait_player_num_wg, &side_launchers, &player_loc, &launchers)
+	go connection(&players, &wg, &player_num, &remove_player, should_close_connection, &wg_disconnect, client, &wait_player_num_wg, &side_launchers, &player_loc)
 	go func() {
 		time.Sleep(5 * time.Second)
 		if player_num == 255 {
@@ -66,14 +68,14 @@ func game_loop(should_close_connection *bool, client *tcp.Client, player_texture
 		}
 		players[player_num].DrawArrow(arrow)
 
-		for i := 0; i < len(collision_rects); i++ {
+		for i := 0; i < collision_rect_len; i++ {
 			rl.DrawRectangleRec(collision_rects[i], rl.Black)
 		}
 		for i := 0; i < len(side_launchers); i++ {
 			side_launchers[i].Update(side_launcher_textures)
 		}
 		for i := 0; i < len(launchers); i++ {
-			launchers[i].Update(launchers_textures)
+			launchers[i].Update(launcher_texture)
 		}
 
 		rl.EndMode2D()

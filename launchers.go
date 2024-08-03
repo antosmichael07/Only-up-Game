@@ -47,24 +47,15 @@ func (side_launcher *SideLauncher) Update(side_launcher_textures *[2][4]rl.Textu
 }
 
 type Launcher struct {
-	Rect           rl.Rectangle
-	Power          float32
-	AnimationTimer float32
+	Rect  rl.Rectangle
+	Power float32
 }
 
 func NewLauncher(x, y, power float32, collision_rects *[]rl.Rectangle) Launcher {
-	*collision_rects = append(*collision_rects, rl.NewRectangle(x+1, y+6, 58, 4))
-	return Launcher{rl.NewRectangle(x+1, y+2, 58, 8), -power, 0}
+	*collision_rects = append(*collision_rects, rl.NewRectangle(x, y, 60, 10))
+	return Launcher{rl.NewRectangle(x+5, y-1, 50, 11), -power}
 }
 
-func (launcher *Launcher) Update(launcher_textures *[2]rl.Texture2D) {
-	if launcher.AnimationTimer > 0 {
-		launcher.AnimationTimer -= rl.GetFrameTime()
-	}
-
-	if launcher.AnimationTimer > 0 {
-		rl.DrawTexture(launcher_textures[1], int32(launcher.Rect.X)-1, int32(launcher.Rect.Y)-2, rl.White)
-	} else {
-		rl.DrawTexture(launcher_textures[0], int32(launcher.Rect.X)-1, int32(launcher.Rect.Y)-2, rl.White)
-	}
+func (launcher *Launcher) Update(launcher_texture *rl.Texture2D) {
+	rl.DrawTexture(*launcher_texture, int32(launcher.Rect.X)-5, int32(launcher.Rect.Y)+1, rl.White)
 }

@@ -16,10 +16,9 @@ const (
 	event_player_kick
 	event_i_wanna_leave
 	event_side_launcher_launched
-	event_launcher_launched
 )
 
-func connection(players *[]Player, wg *sync.WaitGroup, player_num *byte, remove_player *byte, should_close_connection *bool, wg_disconnect *sync.WaitGroup, client *tcp.Client, wait_player_num_wg *sync.WaitGroup, side_launchers *[]SideLauncher, player_loc *rl.Vector2, launchers *[]Launcher) {
+func connection(players *[]Player, wg *sync.WaitGroup, player_num *byte, remove_player *byte, should_close_connection *bool, wg_disconnect *sync.WaitGroup, client *tcp.Client, wait_player_num_wg *sync.WaitGroup, side_launchers *[]SideLauncher, player_loc *rl.Vector2) {
 	wait_player_num := byte(255)
 
 	client.On(event_player_leave, func(data *[]byte) {
@@ -78,12 +77,6 @@ func connection(players *[]Player, wg *sync.WaitGroup, player_num *byte, remove_
 	client.On(event_side_launcher_launched, func(data *[]byte) {
 		if (*side_launchers)[(*data)[0]].AnimationTimer <= 0 {
 			(*side_launchers)[(*data)[0]].AnimationTimer = 2
-		}
-	})
-
-	client.On(event_launcher_launched, func(data *[]byte) {
-		if (*launchers)[(*data)[0]].AnimationTimer <= 0 {
-			(*launchers)[(*data)[0]].AnimationTimer = 2
 		}
 	})
 

@@ -19,7 +19,6 @@ const (
 	event_player_kick
 	event_i_wanna_leave
 	event_side_launcher_launched
-	event_launcher_launched
 )
 
 type Vector2 struct {
@@ -76,12 +75,6 @@ func main() {
 	server.On(event_side_launcher_launched, func(data *[]byte, conn *tcp.Connection) {
 		if len(*data) == 1 {
 			server.SendDataToAll(event_side_launcher_launched, data)
-		}
-	})
-
-	server.On(event_launcher_launched, func(data *[]byte, conn *tcp.Connection) {
-		if len(*data) == 1 {
-			server.SendDataToAll(event_launcher_launched, data)
 		}
 	})
 
