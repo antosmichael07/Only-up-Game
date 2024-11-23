@@ -10,23 +10,21 @@ import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
-func init_game(object_textures *[]rl.Texture2D) ([]Player, []rl.Rectangle, []SideLauncher, []Launcher, rl.Camera2D, []Object) {
+func init_game() ([]Player, []rl.Rectangle, []SideLauncher, []Launcher, rl.Camera2D, []Object) {
 	players := []Player{}
 
 	collision_rects := []rl.Rectangle{}
 	side_launchers := []SideLauncher{}
 	launchers := []Launcher{}
-	objects := []Object{
-		NewObject(0, -100, OBJECT_CONTAINER_WIDTH, OBJECT_CONTAINER_HEIGHT, &(*object_textures)[OBJECT_CONTAINER], &collision_rects),
-	}
+	objects := []Object{}
 
 	camera := rl.NewCamera2D(rl.NewVector2(float32(rl.GetScreenWidth()/2), float32(rl.GetScreenHeight()/2)), rl.NewVector2(225, 0), 0, 4)
 
 	return players, collision_rects, side_launchers, launchers, camera, objects
 }
 
-func game_loop(should_close_connection *bool, client *tcp.Client, player_textures *[][3]rl.Texture2D, arrow *rl.Texture2D, buttons *Buttons, is_game_menu_open *bool, side_launcher_textures *[2][4]rl.Texture2D, err *error, settings *Settings, launcher_texture *rl.Texture2D, object_textures *[]rl.Texture2D, background_texture *rl.Texture2D) {
-	players, collision_rects, side_launchers, launchers, camera, objects := init_game(object_textures)
+func game_loop(should_close_connection *bool, client *tcp.Client, player_textures *[][3]rl.Texture2D, arrow *rl.Texture2D, buttons *Buttons, is_game_menu_open *bool, side_launcher_textures *[2][4]rl.Texture2D, err *error, settings *Settings, launcher_texture *rl.Texture2D, background_texture *rl.Texture2D) {
+	players, collision_rects, side_launchers, launchers, camera, objects := init_game()
 	player_num := byte(255)
 	remove_player := byte(255)
 	player_loc := rl.Vector2{}

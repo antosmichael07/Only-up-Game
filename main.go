@@ -97,17 +97,17 @@ func main() {
 	rl.InitAudioDevice()
 	button_click_sound := rl.LoadSound("resources/sounds/button_click.wav")
 
-	object_textures := []rl.Texture2D{
-		rl.LoadTexture("./resources/textures/objects/container.png"),
-		rl.LoadTexture("./resources/textures/objects/cardboard_box.png"),
-		rl.LoadTexture("./resources/textures/objects/pallets.png"),
-		rl.LoadTexture("./resources/textures/objects/metal_pipe.png"),
-	}
-
 	background_texture := rl.LoadTexture("resources/textures/background.png")
 
+	pre_objects[OBJECT_CONTAINER].Texture = rl.LoadTexture("./resources/textures/objects/container.png")
+	pre_objects[OBJECT_CARDBOARD_BOX].Texture = rl.LoadTexture("./resources/textures/objects/cardboard_box.png")
+	pre_objects[OBJECT_PALLETS].Texture = rl.LoadTexture("./resources/textures/objects/pallets.png")
+	pre_objects[OBJECT_METAL_PIPE].Texture = rl.LoadTexture("./resources/textures/objects/metal_pipe.png")
+	pre_objects[OBJECT_METAL_SUPPORT].Texture = rl.LoadTexture("./resources/textures/objects/metal_support.png")
+	pre_objects[OBJECT_METAL_SUPPORT_HORIZONTAL].Texture = rl.LoadTexture("./resources/textures/objects/metal_support_horizontal.png")
+
 	buttons.SetSound(&button_click_sound)
-	init_buttons(&buttons, &input_box, &should_close_connection, &stop_trying_to_connect, &ip, &back_from_credits, &player_textures, &arrow, &go_back, &cursor, &cursor_timer, &is_game_menu_open, &err, &side_launcher_textures, &settings, &is_settings_open, &wait_for_server, &server_err, &launcher_texture, &object_textures, &background_texture)
+	init_buttons(&buttons, &input_box, &should_close_connection, &stop_trying_to_connect, &ip, &back_from_credits, &player_textures, &arrow, &go_back, &cursor, &cursor_timer, &is_game_menu_open, &err, &side_launcher_textures, &settings, &is_settings_open, &wait_for_server, &server_err, &launcher_texture, &background_texture)
 
 	main_menu(&buttons)
 }

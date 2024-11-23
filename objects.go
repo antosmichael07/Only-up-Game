@@ -9,35 +9,38 @@ type Object struct {
 	Texture  *rl.Texture2D
 }
 
+type PreObject struct {
+	Width   float32
+	Height  float32
+	Texture rl.Texture2D
+}
+
 const (
 	OBJECT_CONTAINER = iota
 	OBJECT_CARDBOARD_BOX
 	OBJECT_PALLETS
 	OBJECT_METAL_PIPE
+	OBJECT_METAL_SUPPORT
+	OBJECT_METAL_SUPPORT_HORIZONTAL
 )
 
-const (
-	OBJECT_CONTAINER_WIDTH  = 250
-	OBJECT_CONTAINER_HEIGHT = 100
+var pre_objects = []PreObject{
+	{250, 100, rl.Texture2D{}},
+	{25, 25, rl.Texture2D{}},
+	{50, 10, rl.Texture2D{}},
+	{200, 50, rl.Texture2D{}},
+	{25, 150, rl.Texture2D{}},
+	{150, 25, rl.Texture2D{}},
+}
 
-	OBJECT_CARDBOARD_BOX_WIDTH  = 25
-	OBJECT_CARDBOARD_BOX_HEIGHT = 25
-
-	OBJECT_PALLETS_WIDTH  = 50
-	OBJECT_PALLETS_HEIGHT = 10
-
-	OBJECT_METAL_PIPE_WIDTH  = 200
-	OBJECT_METAL_PIPE_HEIGHT = 50
-)
-
-func NewObject(x, y, width, height float32, texture *rl.Texture2D, collision_rects *[]rl.Rectangle) Object {
-	*collision_rects = append(*collision_rects, rl.NewRectangle(x, y, width, height))
+func NewObject(x, y float32, obj uint, collision_rects *[]rl.Rectangle) Object {
+	*collision_rects = append(*collision_rects, rl.NewRectangle(x, y, pre_objects[obj].Width, pre_objects[obj].Height))
 
 	return Object{
 		Position: rl.NewVector2(x, y),
-		Width:    width,
-		Height:   height,
-		Texture:  texture,
+		Width:    pre_objects[obj].Width,
+		Height:   pre_objects[obj].Height,
+		Texture:  &pre_objects[obj].Texture,
 	}
 }
 
