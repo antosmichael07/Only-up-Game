@@ -10,24 +10,24 @@ import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
-func init_game() ([]Player, []rl.Rectangle, []SideLauncher, []Launcher, rl.Camera2D, int, []Object) {
+func init_game(object_textures *[]rl.Texture2D) ([]Player, []rl.Rectangle, []SideLauncher, []Launcher, rl.Camera2D, []Object) {
 	players := []Player{}
 
 	collision_rects := []rl.Rectangle{}
 	side_launchers := []SideLauncher{}
 	launchers := []Launcher{}
 	objects := []Object{
-		NewObject(-100, 1000, 250, 100, rl.LoadTexture("./resources/textures/objects/container.png"), &collision_rects),
+		NewObject(-100, 0, 250, 100, &(*object_textures)[OBJECT_CONTAINER], &collision_rects),
+		NewObject(200, 0, 250, 100, &(*object_textures)[OBJECT_CONTAINER], &collision_rects),
 	}
-	object_len := len(objects)
 
 	camera := rl.NewCamera2D(rl.NewVector2(float32(rl.GetScreenWidth()/2), float32(rl.GetScreenHeight()/2)), rl.NewVector2(225, 0), 0, 4)
 
-	return players, collision_rects, side_launchers, launchers, camera, object_len, objects
+	return players, collision_rects, side_launchers, launchers, camera, objects
 }
 
-func game_loop(should_close_connection *bool, client *tcp.Client, player_textures *[][3]rl.Texture2D, arrow *rl.Texture2D, buttons *Buttons, is_game_menu_open *bool, side_launcher_textures *[2][4]rl.Texture2D, err *error, settings *Settings, launcher_texture *rl.Texture2D) {
-	players, collision_rects, side_launchers, launchers, camera, object_len, objects := init_game()
+func game_loop(should_close_connection *bool, client *tcp.Client, player_textures *[][3]rl.Texture2D, arrow *rl.Texture2D, buttons *Buttons, is_game_menu_open *bool, side_launcher_textures *[2][4]rl.Texture2D, err *error, settings *Settings, launcher_texture *rl.Texture2D, object_textures *[]rl.Texture2D) {
+	players, collision_rects, side_launchers, launchers, camera, objects := init_game(object_textures)
 	player_num := byte(255)
 	remove_player := byte(255)
 	player_loc := rl.Vector2{}
@@ -66,7 +66,7 @@ func game_loop(should_close_connection *bool, client *tcp.Client, player_texture
 		}
 		players[player_num].DrawArrow(arrow)
 
-		for i := 0; i < object_len; i++ {
+		for i := 0; i < len(objects); i++ {
 			objects[i].Draw()
 		}
 		for i := 0; i < len(side_launchers); i++ {

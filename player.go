@@ -146,6 +146,11 @@ func (player *Player) Fall(collision_rects *[]rl.Rectangle) {
 	player_rect := rl.NewRectangle(player.Position.X, player.Position.Y+player.Gravity*player.FrameTime, player.Scale.X, player.Scale.Y)
 
 	if player.Gravity > 0 {
+		if player.Position.Y >= -player.Scale.Y {
+			player.Gravity = 0
+			player.Position.Y = -player.Scale.Y
+			return
+		}
 		for i := 0; i < len(*collision_rects); i++ {
 			if rl.CheckCollisionRecs(player_rect, (*collision_rects)[i]) {
 				player.Gravity = 0
@@ -167,6 +172,10 @@ func (player *Player) Fall(collision_rects *[]rl.Rectangle) {
 }
 
 func (player *Player) OnGround(collision_rects *[]rl.Rectangle) bool {
+	if player.Position.Y == -player.Scale.Y {
+		return true
+	}
+
 	player_rect := rl.NewRectangle(player.Position.X, player.Position.Y+1, player.Scale.X, player.Scale.Y)
 
 	for i := 0; i < len(*collision_rects); i++ {
