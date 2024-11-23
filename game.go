@@ -10,28 +10,24 @@ import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
-func init_game() ([]Player, []rl.Rectangle, []SideLauncher, []Launcher, rl.Camera2D, int) {
+func init_game() ([]Player, []rl.Rectangle, []SideLauncher, []Launcher, rl.Camera2D, int, []Object) {
 	players := []Player{}
 
-	collision_rects := []rl.Rectangle{
-		rl.NewRectangle(-200, 200, 500, 25),
-	}
-
-	collision_rect_len := len(collision_rects)
-
+	collision_rects := []rl.Rectangle{}
 	side_launchers := []SideLauncher{}
-
-	launchers := []Launcher{
-		NewLauncher(0, 190, 8, &collision_rects),
+	launchers := []Launcher{}
+	objects := []Object{
+		NewObject(-100, 1000, 250, 100, rl.LoadTexture("./resources/textures/objects/container.png"), &collision_rects),
 	}
+	object_len := len(objects)
 
 	camera := rl.NewCamera2D(rl.NewVector2(float32(rl.GetScreenWidth()/2), float32(rl.GetScreenHeight()/2)), rl.NewVector2(225, 0), 0, 4)
 
-	return players, collision_rects, side_launchers, launchers, camera, collision_rect_len
+	return players, collision_rects, side_launchers, launchers, camera, object_len, objects
 }
 
 func game_loop(should_close_connection *bool, client *tcp.Client, player_textures *[][3]rl.Texture2D, arrow *rl.Texture2D, buttons *Buttons, is_game_menu_open *bool, side_launcher_textures *[2][4]rl.Texture2D, err *error, settings *Settings, launcher_texture *rl.Texture2D) {
-	players, collision_rects, side_launchers, launchers, camera, collision_rect_len := init_game()
+	players, collision_rects, side_launchers, launchers, camera, object_len, objects := init_game()
 	player_num := byte(255)
 	remove_player := byte(255)
 	player_loc := rl.Vector2{}
@@ -70,8 +66,8 @@ func game_loop(should_close_connection *bool, client *tcp.Client, player_texture
 		}
 		players[player_num].DrawArrow(arrow)
 
-		for i := 0; i < collision_rect_len; i++ {
-			rl.DrawRectangleRec(collision_rects[i], rl.Black)
+		for i := 0; i < object_len; i++ {
+			objects[i].Draw()
 		}
 		for i := 0; i < len(side_launchers); i++ {
 			side_launchers[i].Update(side_launcher_textures)
