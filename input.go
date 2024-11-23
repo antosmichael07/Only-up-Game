@@ -17,7 +17,7 @@ func (player *Player) Input(settings *Settings) {
 		player.Keys[1] = 0
 	}
 
-	if rl.IsKeyDown(settings.PlayerJump) && !player.Kicking {
+	if rl.IsKeyPressed(settings.PlayerJump) && !player.Kicking {
 		player.Keys[2] = 1
 	} else {
 		player.Keys[2] = 0

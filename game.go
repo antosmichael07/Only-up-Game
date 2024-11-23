@@ -17,7 +17,7 @@ func init_game(object_textures *[]rl.Texture2D) ([]Player, []rl.Rectangle, []Sid
 	side_launchers := []SideLauncher{}
 	launchers := []Launcher{}
 	objects := []Object{
-		NewObject(0, -100, 200, 50, &(*object_textures)[OBJECT_METAL_PIPE], &collision_rects),
+		NewObject(0, -100, OBJECT_CONTAINER_WIDTH, OBJECT_CONTAINER_HEIGHT, &(*object_textures)[OBJECT_CONTAINER], &collision_rects),
 	}
 
 	camera := rl.NewCamera2D(rl.NewVector2(float32(rl.GetScreenWidth()/2), float32(rl.GetScreenHeight()/2)), rl.NewVector2(225, 0), 0, 4)

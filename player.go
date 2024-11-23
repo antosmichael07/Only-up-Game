@@ -176,7 +176,7 @@ func (player *Player) OnGround(collision_rects *[]rl.Rectangle) bool {
 		return true
 	}
 
-	player_rect := rl.NewRectangle(player.Position.X, player.Position.Y+1, player.Scale.X, player.Scale.Y)
+	player_rect := rl.NewRectangle(player.Position.X-1, player.Position.Y+1, player.Scale.X+2, player.Scale.Y)
 
 	for i := 0; i < len(*collision_rects); i++ {
 		if rl.CheckCollisionRecs(player_rect, (*collision_rects)[i]) {
