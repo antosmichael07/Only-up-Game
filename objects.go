@@ -29,8 +29,8 @@ var pre_objects = []PreObject{
 	{25, 25, rl.Texture2D{}},
 	{50, 10, rl.Texture2D{}},
 	{200, 50, rl.Texture2D{}},
-	{25, 150, rl.Texture2D{}},
-	{150, 25, rl.Texture2D{}},
+	{20, 150, rl.Texture2D{}},
+	{150, 20, rl.Texture2D{}},
 }
 
 func NewObject(x, y float32, obj uint, collision_rects *[]rl.Rectangle) Object {
