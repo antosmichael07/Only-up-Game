@@ -11,6 +11,9 @@ type Object struct {
 
 const (
 	OBJECT_CONTAINER = iota
+	OBJECT_CARDBOARD_BOX
+	OBJECT_PALLETS
+	OBJECT_METAL_PIPE
 )
 
 func NewObject(x, y, width, height float32, texture *rl.Texture2D, collision_rects *[]rl.Rectangle) Object {
