@@ -26,6 +26,7 @@ const (
 	OBJECT_METAL_SUPPORT
 	OBJECT_METAL_SUPPORT_HORIZONTAL
 	OBJECT_BRICK
+	OBJECT_BOLT
 )
 
 var pre_objects = []PreObject{
@@ -39,6 +40,7 @@ var pre_objects = []PreObject{
 	{20, 150, rl.Texture2D{}},
 	{150, 20, rl.Texture2D{}},
 	{20, 10, rl.Texture2D{}},
+	{5, 10, rl.Texture2D{}},
 }
 
 func NewObject(x, y float32, obj uint, collision_rects *[]rl.Rectangle) Object {
