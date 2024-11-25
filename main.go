@@ -99,7 +99,10 @@ func main() {
 
 	background_texture := rl.LoadTexture("resources/textures/background.png")
 
-	pre_objects[OBJECT_CONTAINER].Texture = rl.LoadTexture("./resources/textures/objects/container.png")
+	pre_objects[OBJECT_CONTAINER_RED].Texture = rl.LoadTexture("./resources/textures/objects/container_red.png")
+	pre_objects[OBJECT_CONTAINER_GREEN].Texture = rl.LoadTexture("./resources/textures/objects/container_green.png")
+	pre_objects[OBJECT_CONTAINER_BLUE].Texture = rl.LoadTexture("./resources/textures/objects/container_blue.png")
+	pre_objects[OBJECT_CONTAINER_YELLOW].Texture = rl.LoadTexture("./resources/textures/objects/container_yellow.png")
 	pre_objects[OBJECT_CARDBOARD_BOX].Texture = rl.LoadTexture("./resources/textures/objects/cardboard_box.png")
 	pre_objects[OBJECT_PALLETS].Texture = rl.LoadTexture("./resources/textures/objects/pallets.png")
 	pre_objects[OBJECT_METAL_PIPE].Texture = rl.LoadTexture("./resources/textures/objects/metal_pipe.png")

@@ -16,7 +16,10 @@ type PreObject struct {
 }
 
 const (
-	OBJECT_CONTAINER = iota
+	OBJECT_CONTAINER_RED = iota
+	OBJECT_CONTAINER_GREEN
+	OBJECT_CONTAINER_BLUE
+	OBJECT_CONTAINER_YELLOW
 	OBJECT_CARDBOARD_BOX
 	OBJECT_PALLETS
 	OBJECT_METAL_PIPE
@@ -26,6 +29,9 @@ const (
 )
 
 var pre_objects = []PreObject{
+	{250, 100, rl.Texture2D{}},
+	{250, 100, rl.Texture2D{}},
+	{250, 100, rl.Texture2D{}},
 	{250, 100, rl.Texture2D{}},
 	{25, 25, rl.Texture2D{}},
 	{50, 10, rl.Texture2D{}},
