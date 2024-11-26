@@ -110,6 +110,7 @@ func main() {
 	pre_objects[OBJECT_METAL_SUPPORT_HORIZONTAL].Texture = rl.LoadTexture("./resources/textures/objects/metal_support_horizontal.png")
 	pre_objects[OBJECT_BRICK].Texture = rl.LoadTexture("./resources/textures/objects/brick.png")
 	pre_objects[OBJECT_BOLT].Texture = rl.LoadTexture("./resources/textures/objects/bolt.png")
+	pre_objects[OBJECT_TOILET].Texture = rl.LoadTexture("./resources/textures/objects/toilet.png")
 
 	buttons.SetSound(&button_click_sound)
 	init_buttons(&buttons, &input_box, &should_close_connection, &stop_trying_to_connect, &ip, &back_from_credits, &player_textures, &arrow, &go_back, &cursor, &cursor_timer, &is_game_menu_open, &err, &side_launcher_textures, &settings, &is_settings_open, &wait_for_server, &server_err, &launcher_texture, &background_texture)

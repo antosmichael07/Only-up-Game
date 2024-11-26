@@ -41,14 +41,13 @@ func NewPlayer() Player {
 	return player
 }
 
-func (player *Player) Update(collision_rects *[]rl.Rectangle, side_launchers *[]SideLauncher, launchers *[]Launcher, player_textures *[][3]rl.Texture2D, players *[]Player, client *tcp.Client) {
+func (player *Player) Update(collision_rects *[]rl.Rectangle, side_launchers *[]SideLauncher, launchers *[]Launcher, players *[]Player, client *tcp.Client) {
 	player.FrameTime = rl.GetFrameTime() * 60
 
 	launched := player.Launcher(launchers, client)
 	player.Movement(collision_rects, &launched)
 	player.Fall(collision_rects)
 	player.SideLauncher(side_launchers, collision_rects, client)
-	player.Drawing(player_textures)
 }
 
 func (player *Player) Drawing(player_textures *[][3]rl.Texture2D) {

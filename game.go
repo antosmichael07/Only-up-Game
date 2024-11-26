@@ -59,9 +59,8 @@ func game_loop(should_close_connection *bool, client *tcp.Client, player_texture
 		update_camera(&players, &camera, &player_num)
 
 		for i := 0; i < len(players); i++ {
-			players[i].Update(&collision_rects, &side_launchers, &launchers, player_textures, &players, client)
+			players[i].Update(&collision_rects, &side_launchers, &launchers, &players, client)
 		}
-		players[player_num].DrawArrow(arrow)
 
 		for i := 0; i < len(objects); i++ {
 			objects[i].Draw()
@@ -73,7 +72,11 @@ func game_loop(should_close_connection *bool, client *tcp.Client, player_texture
 			launchers[i].Update(launcher_texture)
 		}
 
+		players[player_num].Drawing(player_textures)
+
 		rl.DrawTexture(*background_texture, int32(players[player_num].Position.X)/40*40-int32(rl.GetScreenWidth())/2, -10, rl.White)
+
+		players[player_num].DrawArrow(arrow)
 
 		rl.EndMode2D()
 		if *is_game_menu_open {
