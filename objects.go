@@ -44,10 +44,10 @@ var pre_objects = []PreObject{
 }
 
 func NewObject(x, y float32, obj uint, collision_rects *[]rl.Rectangle) Object {
-	*collision_rects = append(*collision_rects, rl.NewRectangle(x, y, pre_objects[obj].Width, pre_objects[obj].Height))
+	*collision_rects = append(*collision_rects, rl.NewRectangle(x, -y, pre_objects[obj].Width, pre_objects[obj].Height))
 
 	return Object{
-		Position: rl.NewVector2(x, y),
+		Position: rl.NewVector2(x, -y),
 		Width:    pre_objects[obj].Width,
 		Height:   pre_objects[obj].Height,
 		Texture:  &pre_objects[obj].Texture,
@@ -56,4 +56,13 @@ func NewObject(x, y float32, obj uint, collision_rects *[]rl.Rectangle) Object {
 
 func (o *Object) Draw() {
 	rl.DrawTexture(*o.Texture, int32(o.Position.X), int32(o.Position.Y), rl.White)
+}
+
+func NewCollisionRect(x, y, width, height float32) rl.Rectangle {
+	return rl.Rectangle{
+		X:      x,
+		Y:      -y,
+		Width:  width,
+		Height: height,
+	}
 }
