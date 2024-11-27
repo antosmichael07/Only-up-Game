@@ -22,6 +22,10 @@ func init_game() ([]Player, []CollisionRect, []SideLauncher, []Launcher, rl.Came
 	}
 	objects := []Object{
 		NewObject(200, 100, OBJECT_CONTAINER_RED, &collision_rects),
+		NewObject(0, 50, OBJECT_SCAFFOLDING_HOLE, &collision_rects),
+		NewObject(-100, 50, OBJECT_SCAFFOLDING, &collision_rects),
+		NewObject(-200, 50, OBJECT_SCAFFOLDING_LADDER, &collision_rects),
+		NewObject(-200, 100, OBJECT_SCAFFOLDING_LADDER, &collision_rects),
 	}
 
 	camera := rl.NewCamera2D(rl.NewVector2(float32(rl.GetScreenWidth()/2), float32(rl.GetScreenHeight()/2)), rl.NewVector2(225, 0), 0, 4)
