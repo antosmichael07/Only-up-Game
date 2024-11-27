@@ -24,6 +24,11 @@ type Player struct {
 	Kicking            bool
 }
 
+type CollisionRect struct {
+	Rect      rl.Rectangle
+	Climbable bool
+}
+
 func NewPlayer() Player {
 	player := Player{}
 	player.Position = rl.NewVector2(100, 100)
@@ -41,7 +46,19 @@ func NewPlayer() Player {
 	return player
 }
 
-func (player *Player) Update(collision_rects *[]rl.Rectangle, side_launchers *[]SideLauncher, launchers *[]Launcher, players *[]Player, client *tcp.Client) {
+func NewCollisionRect(x, y, width, height float32, climbable bool) CollisionRect {
+	return CollisionRect{
+		Rect: rl.Rectangle{
+			X: x,
+			Y: y,
+			Width: width,
+			Height: height,
+		},
+		Climbable: climbable,
+	}
+}
+
+func (player *Player) Update(collision_rects *[]CollisionRect, side_launchers *[]SideLauncher, launchers *[]Launcher, players *[]Player, client *tcp.Client) {
 	player.FrameTime = rl.GetFrameTime() * 60
 
 	launched := player.Launcher(launchers, client)
@@ -103,7 +120,7 @@ func (player *Player) Draw(textures *[3]rl.Texture2D) {
 	}
 }
 
-func (player *Player) Movement(collision_rects *[]rl.Rectangle, launched *bool) {
+func (player *Player) Movement(collision_rects *[]CollisionRect, launched *bool) {
 	if player.Keys[0] == 1 {
 		player.Direction = -1
 		if player.SideLauncherPower == 0 {
@@ -122,15 +139,15 @@ func (player *Player) Movement(collision_rects *[]rl.Rectangle, launched *bool) 
 	}
 }
 
-func (player *Player) Move(collision_rects *[]rl.Rectangle, speed float32) {
+func (player *Player) Move(collision_rects *[]CollisionRect, speed float32) {
 	player_rect := rl.NewRectangle(player.Position.X+speed*player.FrameTime, player.Position.Y, player.Scale.X, player.Scale.Y)
 
 	for i := 0; i < len(*collision_rects); i++ {
-		if rl.CheckCollisionRecs(player_rect, (*collision_rects)[i]) {
+		if rl.CheckCollisionRecs(player_rect, (*collision_rects)[i].Rect) {
 			if speed > 0 {
-				player.Position.X = (*collision_rects)[i].X - player.Scale.X
+				player.Position.X = (*collision_rects)[i].Rect.X - player.Scale.X
 			} else {
-				player.Position.X = (*collision_rects)[i].X + (*collision_rects)[i].Width
+				player.Position.X = (*collision_rects)[i].Rect.X + (*collision_rects)[i].Rect.Width
 			}
 			return
 		}
@@ -139,7 +156,7 @@ func (player *Player) Move(collision_rects *[]rl.Rectangle, speed float32) {
 	player.Position.X += speed * player.FrameTime
 }
 
-func (player *Player) Fall(collision_rects *[]rl.Rectangle) {
+func (player *Player) Fall(collision_rects *[]CollisionRect) {
 	player.Gravity += player.GravityPower * player.FrameTime
 
 	player_rect := rl.NewRectangle(player.Position.X, player.Position.Y+player.Gravity*player.FrameTime, player.Scale.X, player.Scale.Y)
@@ -151,17 +168,17 @@ func (player *Player) Fall(collision_rects *[]rl.Rectangle) {
 			return
 		}
 		for i := 0; i < len(*collision_rects); i++ {
-			if rl.CheckCollisionRecs(player_rect, (*collision_rects)[i]) {
+			if rl.CheckCollisionRecs(player_rect, (*collision_rects)[i].Rect) {
 				player.Gravity = 0
-				player.Position.Y = (*collision_rects)[i].Y - player.Scale.Y
+				player.Position.Y = (*collision_rects)[i].Rect.Y - player.Scale.Y
 				return
 			}
 		}
 	} else {
 		for i := 0; i < len(*collision_rects); i++ {
-			if rl.CheckCollisionRecs(player_rect, (*collision_rects)[i]) {
+			if rl.CheckCollisionRecs(player_rect, (*collision_rects)[i].Rect) {
 				player.Gravity = 0
-				player.Position.Y = (*collision_rects)[i].Y + (*collision_rects)[i].Height
+				player.Position.Y = (*collision_rects)[i].Rect.Y + (*collision_rects)[i].Rect.Height
 				return
 			}
 		}
@@ -170,23 +187,30 @@ func (player *Player) Fall(collision_rects *[]rl.Rectangle) {
 	player.Position.Y += player.Gravity * player.FrameTime
 }
 
-func (player *Player) OnGround(collision_rects *[]rl.Rectangle) bool {
+func (player *Player) OnGround(collision_rects *[]CollisionRect) bool {
 	if player.Position.Y == -player.Scale.Y {
 		return true
 	}
 
-	player_rect := rl.NewRectangle(player.Position.X-1, player.Position.Y+1, player.Scale.X+2, player.Scale.Y)
+	player_climbable_rect := rl.NewRectangle(player.Position.X-1, player.Position.Y+1, player.Scale.X+2, player.Scale.Y)
+	player_rect := rl.NewRectangle(player.Position.X, player.Position.Y+1, player.Scale.X, player.Scale.Y)
 
 	for i := 0; i < len(*collision_rects); i++ {
-		if rl.CheckCollisionRecs(player_rect, (*collision_rects)[i]) {
-			return true
+		if (*collision_rects)[i].Climbable {
+			if rl.CheckCollisionRecs(player_climbable_rect, (*collision_rects)[i].Rect) {
+				return true
+			}
+		} else {
+			if rl.CheckCollisionRecs(player_rect, (*collision_rects)[i].Rect) {
+				return true
+			}
 		}
 	}
 
 	return false
 }
 
-func (player *Player) SideLauncher(side_launchers *[]SideLauncher, collision_rects *[]rl.Rectangle, client *tcp.Client) {
+func (player *Player) SideLauncher(side_launchers *[]SideLauncher, collision_rects *[]CollisionRect, client *tcp.Client) {
 	player_rect := rl.NewRectangle(player.Position.X, player.Position.Y, player.Scale.X, player.Scale.Y)
 
 	for i := 0; i < len(*side_launchers); i++ {
@@ -233,13 +257,13 @@ func (player *Player) SideLauncher(side_launchers *[]SideLauncher, collision_rec
 	player_rect = rl.NewRectangle(player.Position.X+player.SideLauncherPower*player.FrameTime, player.Position.Y, player.Scale.X, player.Scale.Y)
 
 	for i := 0; i < len(*collision_rects); i++ {
-		if rl.CheckCollisionRecs(player_rect, (*collision_rects)[i]) {
+		if rl.CheckCollisionRecs(player_rect, (*collision_rects)[i].Rect) {
 			if player.SideLauncherPower > 0 {
 				player.SideLauncherPower = player.SideLauncherPower * -1
-				player.Position.X = (*collision_rects)[i].X - player.Scale.X
+				player.Position.X = (*collision_rects)[i].Rect.X - player.Scale.X
 			} else {
 				player.SideLauncherPower = player.SideLauncherPower * -1
-				player.Position.X = (*collision_rects)[i].X + (*collision_rects)[i].Width
+				player.Position.X = (*collision_rects)[i].Rect.X + (*collision_rects)[i].Rect.Width
 			}
 			return
 		}

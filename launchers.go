@@ -8,12 +8,12 @@ type SideLauncher struct {
 	AnimationTimer float32
 }
 
-func NewSideLauncher(x, y, power float32, collision_rects *[]rl.Rectangle) SideLauncher {
+func NewSideLauncher(x, y, power float32, collision_rects *[]CollisionRect) SideLauncher {
 	if power < 0 {
-		*collision_rects = append(*collision_rects, rl.NewRectangle(x+36, -y+10, 14, 40))
+		*collision_rects = append(*collision_rects, NewCollisionRect(x+36, -y+10, 14, 40, true))
 		return SideLauncher{rl.NewRectangle(x+10, -y, 40, 60), power, 0}
 	} else {
-		*collision_rects = append(*collision_rects, rl.NewRectangle(x, -y+10, 14, 40))
+		*collision_rects = append(*collision_rects, NewCollisionRect(x, -y+10, 14, 40, true))
 		return SideLauncher{rl.NewRectangle(x, -y, 40, 60), power, 0}
 	}
 }
@@ -51,8 +51,8 @@ type Launcher struct {
 	Power float32
 }
 
-func NewLauncher(x, y, power float32, collision_rects *[]rl.Rectangle) Launcher {
-	*collision_rects = append(*collision_rects, rl.NewRectangle(x, -y, 60, 10))
+func NewLauncher(x, y, power float32, collision_rects *[]CollisionRect) Launcher {
+	*collision_rects = append(*collision_rects, NewCollisionRect(x, -y, 60, 10, false))
 	return Launcher{rl.NewRectangle(x+5, -y-1, 50, 11), -power}
 }
 

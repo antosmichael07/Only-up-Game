@@ -10,13 +10,19 @@ import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
-func init_game() ([]Player, []rl.Rectangle, []SideLauncher, []Launcher, rl.Camera2D, []Object) {
+func init_game() ([]Player, []CollisionRect, []SideLauncher, []Launcher, rl.Camera2D, []Object) {
 	players := []Player{}
 
-	collision_rects := []rl.Rectangle{}
-	side_launchers := []SideLauncher{}
-	launchers := []Launcher{}
-	objects := []Object{}
+	collision_rects := []CollisionRect{}
+	side_launchers := []SideLauncher{
+		NewSideLauncher(400, 350, -8, &collision_rects),
+	}
+	launchers := []Launcher{
+		NewLauncher(300, 110, 8, &collision_rects),
+	}
+	objects := []Object{
+		NewObject(200, 100, OBJECT_CONTAINER_RED, &collision_rects),
+	}
 
 	camera := rl.NewCamera2D(rl.NewVector2(float32(rl.GetScreenWidth()/2), float32(rl.GetScreenHeight()/2)), rl.NewVector2(225, 0), 0, 4)
 
@@ -53,7 +59,7 @@ func game_loop(should_close_connection *bool, client *tcp.Client, player_texture
 		window_manager()
 		rl.BeginDrawing()
 		rl.ClearBackground(rl.SkyBlue)
-		meters = int32((players)[player_num].Position.Y/20) * -1
+		meters = int32((players)[player_num].Position.Y/50) * -1
 		draw_meters(&meters)
 		rl.BeginMode2D(camera)
 		update_camera(&players, &camera, &player_num)
