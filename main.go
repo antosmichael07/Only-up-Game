@@ -113,7 +113,9 @@ func main() {
 	pre_objects[OBJECT_TOILET].Texture = rl.LoadTexture("./resources/textures/objects/toilet.png")
 	pre_objects[OBJECT_SCAFFOLDING].Texture = rl.LoadTexture("./resources/textures/objects/scaffolding.png")
 	pre_objects[OBJECT_SCAFFOLDING_HOLE].Texture = rl.LoadTexture("./resources/textures/objects/scaffolding_hole.png")
-	pre_objects[OBJECT_SCAFFOLDING_LADDER].Texture = rl.LoadTexture("./resources/textures/objects/scaffolding_ladder.png")
+	pre_objects[OBJECT_SCAFFOLDING_LADDER_LEFT].Texture = rl.LoadTexture("./resources/textures/objects/scaffolding_ladder_left.png")
+	pre_objects[OBJECT_SCAFFOLDING_LADDER_RIGHT].Texture = rl.LoadTexture("./resources/textures/objects/scaffolding_ladder_right.png")
+	pre_objects[OBJECT_SHIP].Texture = rl.LoadTexture("./resources/textures/objects/ship.png")
 
 	buttons.SetSound(&button_click_sound)
 	init_buttons(&buttons, &input_box, &should_close_connection, &stop_trying_to_connect, &ip, &back_from_credits, &player_textures, &arrow, &go_back, &cursor, &cursor_timer, &is_game_menu_open, &err, &side_launcher_textures, &settings, &is_settings_open, &wait_for_server, &server_err, &launcher_texture, &background_texture)

@@ -27,7 +27,9 @@ const (
 	OBJECT_TOILET
 	OBJECT_SCAFFOLDING
 	OBJECT_SCAFFOLDING_HOLE
-	OBJECT_SCAFFOLDING_LADDER
+	OBJECT_SCAFFOLDING_LADDER_LEFT
+	OBJECT_SCAFFOLDING_LADDER_RIGHT
+	OBJECT_SHIP
 )
 
 var pre_objects = []PreObject{
@@ -38,7 +40,7 @@ var pre_objects = []PreObject{
 	{rl.Texture2D{}, []CollisionRect{{rl.Rectangle{X: 0, Y: 0, Width: 25, Height: 25}, true}}},
 	{rl.Texture2D{}, []CollisionRect{{rl.Rectangle{X: 0, Y: 0, Width: 50, Height: 10}, false}}},
 	{rl.Texture2D{}, []CollisionRect{{rl.Rectangle{X: 0, Y: 0, Width: 200, Height: 50}, true}}},
-	{rl.Texture2D{}, []CollisionRect{{rl.Rectangle{X: 0, Y: 0, Width: 20, Height: 150}, false}}},
+	{rl.Texture2D{}, []CollisionRect{{rl.Rectangle{X: 0, Y: 0, Width: 20, Height: 150}, true}}},
 	{rl.Texture2D{}, []CollisionRect{{rl.Rectangle{X: 0, Y: 0, Width: 150, Height: 20}, true}}},
 	{rl.Texture2D{}, []CollisionRect{{rl.Rectangle{X: 0, Y: 0, Width: 20, Height: 10}, true}}},
 	{rl.Texture2D{}, []CollisionRect{{rl.Rectangle{X: 0, Y: 0, Width: 4, Height: 9}, false}}},
@@ -46,6 +48,8 @@ var pre_objects = []PreObject{
 	{rl.Texture2D{}, []CollisionRect{{rl.Rectangle{X: 0, Y: 0, Width: 100, Height: 3}, false}}},
 	{rl.Texture2D{}, []CollisionRect{{rl.Rectangle{X: 0, Y: 0, Width: 20, Height: 3}, false}, {rl.Rectangle{X: 48, Y: 0, Width: 52, Height: 3}, false}}},
 	{rl.Texture2D{}, []CollisionRect{{rl.Rectangle{X: 0, Y: 0, Width: 20, Height: 3}, false}, {rl.Rectangle{X: 48, Y: 0, Width: 52, Height: 3}, false}, {rl.Rectangle{X: 19, Y: 0, Width: 4, Height: 45}, true}}},
+	{rl.Texture2D{}, []CollisionRect{{rl.Rectangle{X: 0, Y: 0, Width: 52, Height: 3}, false}, {rl.Rectangle{X: 77, Y: 0, Width: 23, Height: 3}, false}, {rl.Rectangle{X: 77, Y: 0, Width: 4, Height: 45}, true}}},
+	{rl.Texture2D{}, []CollisionRect{{rl.Rectangle{X: 0, Y: 250, Width: 1300, Height: 100}, true}, {rl.Rectangle{X: 20, Y: 350, Width: 1260, Height: 100}, false}, {rl.Rectangle{X: 1052, Y: 0, Width: 200, Height: 250}, true}}},
 }
 
 func NewObject(x, y float32, obj uint, collision_rects *[]CollisionRect) Object {
